@@ -1,5 +1,8 @@
 ---
 applications:
+  traefik:
+    options:
+      external_hostname: demo.local
   foxglove-studio:
     charm: foxglove-studio-k8s
     series: jammy

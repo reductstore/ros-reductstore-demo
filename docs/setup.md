@@ -8,13 +8,14 @@ This document describes how to set up a demo architecture using MicroK8s, Juju, 
 Install a stricly confined snap version of MicroK8s to avoid issues with Juju:
 
 ```bash
-sudo snap install microk8s --channel 1.31-strict
+sudo snap install microk8s --channel 1.34-strict
 ```
 
 Add your user to the `microk8s` group to avoid using `sudo` for every command, and get access to the `.kube` caching directory
 
 ```bash
-sudo adduser $USER snap_microk8s
+sudo usermod -a -G microk8s $USER
+
 mkdir -p ~/.kube
 sudo chown -f -R $USER ~/.kube
 ```
@@ -34,14 +35,7 @@ microk8s status --wait-ready
 Enable necessary MicroK8s add-ons (DNS, simple storage, and MetalLB for load balancing):
 
 ```bash
-microk8s enable dns
-microk8s enable hostpath-storage
-```
-
-**Note**: To reset MicroK8s to a clean state, you can run:
-
-```bash
-microk8s reset
+sudo microk8s enable dns hostpath-storage
 ```
 
 ## Install Juju
@@ -49,7 +43,7 @@ microk8s reset
 [Juju](https://juju.is/docs/installing) is a tool for deploying and managing applications in Kubernetes and other environments.
 
 ```bash
-sudo snap install juju --channel 3.5/stable
+sudo snap install juju --channel 3.6/stable
 mkdir -p ~/.local/share
 ```
 
@@ -82,7 +76,7 @@ juju switch cos-robotics-model
 ```bash
 curl -L https://raw.githubusercontent.com/ubuntu-robotics/rob-cos-overlay/main/robotics-overlay.yaml -O
 
-juju deploy cos-lite --trust --overlay ./robotics-overlay.yaml
+juju deploy cos-lite --trust --overlay ./config/demo-overlay.yaml
 ```
 
 Find the IP address of the dashboard:
@@ -91,13 +85,21 @@ Find the IP address of the dashboard:
 juju run traefik/0 show-proxied-endpoints | grep catalogue
 ```
 
-For example at `http://192.168.178.220/cos-robotics-model-catalogue`
+For example at `http://192.168.178.94/cos-robotics-model-catalogue`
 
 **Note**: to whipe out the demo from MicroK8s, you can run:
 
 ```bash
 juju switch cos-robotics-model
 juju destroy-model cos-robotics-model --destroy-storage --force --no-wait
+```
+
+## Get Grafana access
+
+Username is `admin`. Get the password with:
+
+```bash
+juju run grafana/0 get-admin-password
 ```
 
 ## Use LXD to simulate robots
@@ -213,7 +215,7 @@ curl -L https://raw.githubusercontent.com/canonical/rob-cos-device-setup/main/se
 sudo bash setup-robcos-device.sh
 ```
 
-Enter the following URL when prompted: `http://192.168.178.220/cos-robotics-model`.
+Enter the following URL when prompted: `http://192.168.178.94/cos-robotics-model`.
 
 ## References
 
