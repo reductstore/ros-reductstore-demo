@@ -1,0 +1,6 @@
+url: http://rob-cos-ip-placeholder/model-name-placeholder-cos-registration-server/
+uid: robot-uid-placeholder
+device-grafana-dashboards: [linux-system, systemd-and-snaps-logs]
+device-foxglove-dashboards: [topics-and-logs, teleop]
+device-loki-alert-rule-files: [human_detected]
+device-prometheus-alert-rule-files: [low_memory]

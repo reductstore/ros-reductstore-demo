@@ -1,0 +1,11 @@
+groups:
+  - name: high_log_rate
+    rules:
+      - alert: HighLogRate
+        expr: 'sum(rate({job="loki.source.journal.read"}[5m])) by (instance) > 100'
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High log rate detected for {{ $labels.instance }}"
+          description: "The log rate for {{ $labels.instance }} has exceeded 100 logs per second for the last 5 minutes."

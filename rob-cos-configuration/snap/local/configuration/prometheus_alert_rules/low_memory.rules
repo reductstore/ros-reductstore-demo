@@ -1,0 +1,11 @@
+groups:
+  - name: low-memory/%%juju_device_uuid%%
+    rules:
+    - alert: 5GBLowMemory%%juju_device_uuid%%
+      annotations:
+        description: "Low memory alert specific to {{ $labels.device_instance }}"
+        summary: "Robot {{ $labels.device_instance }} has less than 5 GB of memory free."
+      expr: (node_memory_MemFree_bytes{device_instance="%%juju_device_uuid%%"})/1e9 < 5
+      for: 5m
+      labels:
+        severity: critical

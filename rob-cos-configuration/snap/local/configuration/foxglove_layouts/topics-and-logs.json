@@ -1,0 +1,22 @@
+{
+    "configById": {
+      "TopicGraph!19ap7q3": {},
+      "RosOut!27jlbuz": {
+        "searchTerms": [],
+        "minLogLevel": 1
+      }
+    },
+    "globalVariables": {
+      "": "\"\""
+    },
+    "userNodes": {},
+    "playbackConfig": {
+      "speed": 1
+    },
+    "layout": {
+      "direction": "row",
+      "first": "TopicGraph!19ap7q3",
+      "second": "RosOut!27jlbuz",
+      "splitPercentage": 49.12718204488778
+    }
+}

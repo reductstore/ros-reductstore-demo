@@ -79,7 +79,7 @@ curl -L https://raw.githubusercontent.com/ubuntu-robotics/rob-cos-overlay/main/r
 juju deploy cos-lite --trust --overlay ./config/demo-overlay.yaml
 ```
 
-Find the IP address of the dashboard:
+Find the IP address and path of the dashboard's Traefik endpoint with:
 
 ```bash
 juju run traefik/0 show-proxied-endpoints | grep catalogue
@@ -162,15 +162,24 @@ Check the status of the container:
 lxc list
 ```
 
+We also want to limit the ressources of the container to simulate a robot:
+
+```bash
+lxc config set robot1 limits.cpu 2
+lxc config set robot1 limits.memory 2GB
+
+lxc restart robot1
+```
+
 Get an mcap file with some ROS 2 data, for example from [Autonomous Mobile Robot (Treescope)](https://foxglove.dev/examples).
 
 Then push the mcap file into the container:
 
 ```bash
- sudo lxc file push example-010-amr.mcap robot1/root/
+sudo lxc file push example-010-amr.mcap robot1/root/
 ```
 
-## Install robotics snaps in the robot
+## Install ROS 2 and ReductStore agent
 
 
 Access the container's shell:
@@ -196,7 +205,19 @@ Install ReductStore snap:
 sudo snap install reductstore
 ```
 
-Install `reductstore_agent` (better if snapped, but not available yet) and run it:
+Check that ReductStore is running:
+
+```bash
+curl http://127.0.0.1:8383/api/v1/info
+```
+
+For the `reductstore_agent`, you need to get the configuration file from the demo repository:
+
+```bash
+lxc file push ./config/reductstore-agent.yaml robot1/root/ros2_ws/config.yaml
+```
+
+Then install and run the `reductstore_agent` recorder with the configuration file:
 
 ```bash
 ros2 run reductstore_agent recorder --ros-args --params-file ./config.yaml
@@ -208,14 +229,46 @@ Run the bag play command in loop mode:
 ros2 bag play example-010-amr.mcap --loop
 ```
 
-Then you need to install some snaps on in the robot with the following script:
+You should see data being sent to ReductStore.
+
+## Install COS for robotics snap
+
+Exit the container shell:
 
 ```bash
-curl -L https://raw.githubusercontent.com/canonical/rob-cos-device-setup/main/setup-robcos-device.sh -O
+exit
+```
+
+First build the configuration snap for COS for robotics:
+
+```bash
+cd rob-cos-configuration
+snapcraft pack
+cd ..
+```
+
+Push the snap into the container as well as the setup script:
+
+```bash
+lxc file push ./rob-cos-configuration/rob-cos-demo-configuration_0.1_amd64.snap robot1/root/
+lxc file push ./config/setup-robcos-device.sh robot1/root/
+```
+
+Access the container's shell again:
+
+```bash
+lxc exec robot1 -- /bin/bash
+```
+
+Then execute the script inside the container:
+
+```bash
 sudo bash setup-robcos-device.sh
 ```
 
 Enter the following URL when prompted: `http://192.168.178.94/cos-robotics-model`.
+
+[More details about the setup script can be found in the tutorial](https://canonical-robotics.readthedocs-hosted.com/en/latest/how-to-guides/operation/write-configuration-snap-for-cos-for-robotics/).
 
 ## References
 
@@ -225,3 +278,4 @@ Enter the following URL when prompted: `http://192.168.178.94/cos-robotics-mode
 - [COS (Canonical Observability Stack) Lite](https://charmhub.io/topics/canonical-observability-stack/editions/lite)
 - [Packaging ROS 2 applications with snaps](https://canonical-robotics.readthedocs-hosted.com/en/latest/tutorials/)
 - [Prevent connectivity issues with LXD and Docker](https://documentation.ubuntu.com/lxd/latest/howto/network_bridge_firewalld/#prevent-connectivity-issues-with-lxd-and-docker)
+- [Traefik Charm Operator](https://github.com/canonical/traefik-k8s-operator)

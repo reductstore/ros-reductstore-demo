@@ -1,0 +1,11 @@
+groups:
+  - name: human_detected/%%juju_device_uuid%%
+    rules:
+      - alert: HumanDetected%%juju_device_uuid%%
+        expr: 'rate({instance="%%juju_device_uuid%%"} |= `Human detected` [24h]) > 10'
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "10 humans detected in the last 24h by {{ $labels.instance }}"
+          description: "The logs of {{ $labels.instance }} have mentioned `Human detected` 10 times in the last 24h."
