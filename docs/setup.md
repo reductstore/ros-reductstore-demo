@@ -87,6 +87,8 @@ juju run traefik/0 show-proxied-endpoints | grep catalogue
 
 For example at `http://192.168.178.94/cos-robotics-model-catalogue`
 
+And for ReductStore at `http://192.168.178.94/cos-robotics-model-reductstore/ui/dashboard`
+
 **Note**: to whipe out the demo from MicroK8s, you can run:
 
 ```bash
@@ -195,8 +197,7 @@ sudo apt update
 sudo apt install -y \
   ros-jazzy-ros-base \
   ros-jazzy-ros2bag \
-  ros-jazzy-rosbag2-storage-mcap \
-  ros-jazzy-rosbag2-storage-sqlite3
+  ros-jazzy-rosbag2-storage-mcap
 ```
 
 Install ReductStore snap:
@@ -217,7 +218,31 @@ For the `reductstore_agent`, you need to get the configuration file from the dem
 lxc file push ./config/reductstore-agent.yaml robot1/root/ros2_ws/config.yaml
 ```
 
-Then install and run the `reductstore_agent` recorder with the configuration file:
+Then install and run the `reductstore_agent`:
+
+```bash
+mkdir -p ~/ros2_ws/src
+cd ~/ros2_ws/src
+git clone https://github.com/reductstore/reductstore_agent.git
+cd ..
+
+# 2. Install system dependencies
+rosdep install --from-paths src --ignore-src -r -y
+
+# 3. Build your package
+colcon build --packages-select reductstore_agent
+
+# 4. Source the workspace and run your node
+source install/local_setup.bash
+```
+
+TODO: only way to install the Python SDK currently is with:
+
+```bash
+PIP_BREAK_SYSTEM_PACKAGES=1 pip3 install --ignore-installed reduct-py
+```
+
+And run the recorder with the configuration file:
 
 ```bash
 ros2 run reductstore_agent recorder --ros-args --params-file ./config.yaml
@@ -250,7 +275,7 @@ cd ..
 Push the snap into the container as well as the setup script:
 
 ```bash
-lxc file push ./rob-cos-configuration/rob-cos-demo-configuration_0.1_amd64.snap robot1/root/
+lxc file push ./rob-cos-configuration/rob-cos-demo-configuration*.snap robot1/root/
 lxc file push ./config/setup-robcos-device.sh robot1/root/
 ```
 
@@ -269,6 +294,21 @@ sudo bash setup-robcos-device.sh
 Enter the following URL when prompted: `http://192.168.178.94/cos-robotics-model`.
 
 [More details about the setup script can be found in the tutorial](https://canonical-robotics.readthedocs-hosted.com/en/latest/how-to-guides/operation/write-configuration-snap-for-cos-for-robotics/).
+
+Note: to remove the device from the COS for robotics dashboard, you can run:
+
+```bash
+curl -v -X 'DELETE' 'http://192.168.178.94/cos-robotics-model-cos-registration-server/api/v1/devices/robot_1/'
+```
+
+```bash
+sudo snap remove rob-cos-grafana-agent
+sudo snap remove foxglove-bridge
+sudo snap remove ros2-exporter-agent
+sudo snap remove cos-registration-agent
+sudo snap remove rob-cos-data-sharing
+sudo snap remove rob-cos-demo-configuration
+```
 
 ## References
 

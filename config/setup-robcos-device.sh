@@ -3,7 +3,7 @@
 echo "Setting up cos for robotics snaps.."
 
 # snap install rob-cos-demo-configuration --beta
-snap install /root/rob-cos-demo-configuration_0.1_amd64.snap --dangerous
+snap install /root/rob-cos-demo-configuration*.snap --dangerous
 echo "Installed configuration snap"
 
 echo "Please enter the device-uid:"
@@ -17,8 +17,12 @@ snap set rob-cos-demo-configuration rob-cos-base-url=$url
 snap install rob-cos-data-sharing --beta
 echo "Installed rob-cos-data sharing snap"
 
-# Installing this snap will automatically try to register the device
+# Installing this snap to register the device with rob-cos
 snap install cos-registration-agent --beta
+
+# Connecting the configuration-read interface to read the device-uid from the configuration snap
+sudo snap connect cos-registration-agent:configuration-read rob-cos-demo-configuration:configuration-read
+
 echo "Installed cos-registration agent snap"
 
 snap install ros2-exporter-agent --beta

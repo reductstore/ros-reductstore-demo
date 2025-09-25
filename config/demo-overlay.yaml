@@ -3,6 +3,15 @@ applications:
   traefik:
     options:
       routing_mode: path
+
+  reductstore:
+    charm: reductstore-k8s
+    channel: edge
+    trust: true
+    resources:
+      reductstore-image: reduct/store:latest
+    scale: 1
+
   foxglove-studio:
     charm: foxglove-studio-k8s
     series: jammy
@@ -13,6 +22,7 @@ applications:
     options:
       server-port: 8080
     # constraints: arch=amd64
+
   ros2bag-fileserver:
     charm: ros2bag-fileserver-k8s
     series: jammy
@@ -25,6 +35,7 @@ applications:
       database: 10G
     options:
       ssh-port: 2222
+
   cos-registration-server:
     charm: cos-registration-server-k8s
     series: jammy
@@ -37,6 +48,7 @@ applications:
       database: 1G
       
 relations:
+  - [reductstore:ingress, traefik:ingress]
   - [foxglove-studio:ingress, traefik:ingress]
   - [foxglove-studio:catalogue, catalogue:catalogue]
   - [ros2bag-fileserver:ingress-tcp, traefik:ingress-per-unit]

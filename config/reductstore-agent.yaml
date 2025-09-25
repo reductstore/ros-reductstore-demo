@@ -1,21 +1,19 @@
 /**/*:
   ros__parameters:
     storage: # local ReductStore instance
-      url: "http://localhost:8383"
-      api_token: "access_token"
+      url: "http://127.0.0.1:8383"
+      api_token: ""
       bucket: "ros_data"
       quota_type: "FIFO"
       quota_size: "200GB"
     pipelines:
       telemetry:
         filename_mode: "timestamp"
+        spool_max_size_bytes: "1KB"
+        compression: "none"
         include_topics:
-          - "/camera/.*"
-        exclude_topics:
-          - "/camera/ignore"
-        static_labels:
-          source: telemetry
-          robot: alpha
+          - "/camera/image_raw/compressed_restamped"
+          - "/rosout"
         split:
-          max_duration_s: 3600
-          max_size_bytes: 10000
+          max_duration_s: 10
+          max_size_bytes: 250000000
