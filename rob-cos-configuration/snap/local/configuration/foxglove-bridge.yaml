@@ -1,0 +1,10 @@
+port: 8765 # websocket port to broadcast ROS data
+address: 0.0.0.0 # websocket address to broadcast ROS data
+topic-whitelist: "[
+  '/camera/image_color/compressed_restamped',
+  '/flir_boson/image_raw/compressed_restamped',
+  '/ground_cloud_restamped',
+  '/tf_restamped',
+  '/rosout',
+  '/vectornav/IMU_restamped'
+]" # topic regex to include topics to the broadcast

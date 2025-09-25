@@ -1,0 +1,44 @@
+logging {
+	level = "info"
+}
+
+prometheus.exporter.unix "default" {
+	// enables more collectors over the default set
+	enable_collectors        = ["systemd", "wifi"]
+	include_exporter_metrics = true
+	disable_collectors       = ["mdadm", "btrfs"]
+}
+
+prometheus.scrape "default" {
+	targets = concat(
+		prometheus.exporter.unix.default.targets,
+		[{
+			// Self-collect metrics
+			job         = "agent",
+			__address__ = "127.0.0.1:12345",
+		}],
+	)
+
+	forward_to = [prometheus.remote_write.default.receiver]
+}
+
+prometheus.remote_write "default" {
+	external_labels = {
+        device_instance = "robot-uid-placeholder",
+    }
+	endpoint {
+		url = "http://rob-cos-ip-placeholder/model-name-placeholder" + "-prometheus-0/api/v1/write"
+	}
+}
+
+loki.source.journal "read" {
+	forward_to     = [loki.write.endpoint.receiver]
+	format_as_json = true
+	labels         = {component = "loki.source.journal", instance = "robot-uid-placeholder"}
+}
+
+loki.write "endpoint" {
+	endpoint {
+		url = "http://rob-cos-ip-placeholder/model-name-placeholder" + "-loki-0/loki/api/v1/push"
+	}
+}

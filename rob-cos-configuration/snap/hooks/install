@@ -1,0 +1,7 @@
+#!/bin/sh -e
+
+cp -R $SNAP/etc/configuration/ $SNAP_COMMON/
+
+snapctl set rob-cos-base-url=$(cat $SNAP_COMMON/configuration/rob-cos-base-url)
+snapctl set device-uid=$(bash generate_device_uid.sh)
+snapctl set configuration-url!

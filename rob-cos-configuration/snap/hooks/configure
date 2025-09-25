@@ -1,0 +1,3 @@
+#!/bin/sh -e
+
+bash $SNAP/usr/bin/search_and_replace.sh

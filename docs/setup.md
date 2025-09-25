@@ -8,13 +8,14 @@ This document describes how to set up a demo architecture using MicroK8s, Juju, 
 Install a stricly confined snap version of MicroK8s to avoid issues with Juju:
 
 ```bash
-sudo snap install microk8s --channel 1.31-strict
+sudo snap install microk8s --channel 1.34-strict
 ```
 
 Add your user to the `microk8s` group to avoid using `sudo` for every command, and get access to the `.kube` caching directory
 
 ```bash
-sudo adduser $USER snap_microk8s
+sudo usermod -a -G microk8s $USER
+
 mkdir -p ~/.kube
 sudo chown -f -R $USER ~/.kube
 ```
@@ -34,14 +35,7 @@ microk8s status --wait-ready
 Enable necessary MicroK8s add-ons (DNS, simple storage, and MetalLB for load balancing):
 
 ```bash
-microk8s enable dns
-microk8s enable hostpath-storage
-```
-
-**Note**: To reset MicroK8s to a clean state, you can run:
-
-```bash
-microk8s reset
+sudo microk8s enable dns hostpath-storage
 ```
 
 ## Install Juju
@@ -49,7 +43,7 @@ microk8s reset
 [Juju](https://juju.is/docs/installing) is a tool for deploying and managing applications in Kubernetes and other environments.
 
 ```bash
-sudo snap install juju --channel 3.5/stable
+sudo snap install juju --channel 3.6/stable
 mkdir -p ~/.local/share
 ```
 
@@ -82,22 +76,32 @@ juju switch cos-robotics-model
 ```bash
 curl -L https://raw.githubusercontent.com/ubuntu-robotics/rob-cos-overlay/main/robotics-overlay.yaml -O
 
-juju deploy cos-lite --trust --overlay ./robotics-overlay.yaml
+juju deploy cos-lite --trust --overlay ./config/demo-overlay.yaml
 ```
 
-Find the IP address of the dashboard:
+Find the IP address and path of the dashboard's Traefik endpoint with:
 
 ```bash
 juju run traefik/0 show-proxied-endpoints | grep catalogue
 ```
 
-For example at `http://192.168.178.220/cos-robotics-model-catalogue`
+For example at `http://192.168.178.94/cos-robotics-model-catalogue`
+
+And for ReductStore at `http://192.168.178.94/cos-robotics-model-reductstore/ui/dashboard`
 
 **Note**: to whipe out the demo from MicroK8s, you can run:
 
 ```bash
 juju switch cos-robotics-model
 juju destroy-model cos-robotics-model --destroy-storage --force --no-wait
+```
+
+## Get Grafana access
+
+Username is `admin`. Get the password with:
+
+```bash
+juju run grafana/0 get-admin-password
 ```
 
 ## Use LXD to simulate robots
@@ -160,15 +164,24 @@ Check the status of the container:
 lxc list
 ```
 
+We also want to limit the ressources of the container to simulate a robot:
+
+```bash
+lxc config set robot1 limits.cpu 2
+lxc config set robot1 limits.memory 2GB
+
+lxc restart robot1
+```
+
 Get an mcap file with some ROS 2 data, for example from [Autonomous Mobile Robot (Treescope)](https://foxglove.dev/examples).
 
 Then push the mcap file into the container:
 
 ```bash
- sudo lxc file push example-010-amr.mcap robot1/root/
+sudo lxc file push example-010-amr.mcap robot1/root/
 ```
 
-## Install robotics snaps in the robot
+## Install ROS 2 and ReductStore agent
 
 
 Access the container's shell:
@@ -184,8 +197,7 @@ sudo apt update
 sudo apt install -y \
   ros-jazzy-ros-base \
   ros-jazzy-ros2bag \
-  ros-jazzy-rosbag2-storage-mcap \
-  ros-jazzy-rosbag2-storage-sqlite3
+  ros-jazzy-rosbag2-storage-mcap
 ```
 
 Install ReductStore snap:
@@ -194,7 +206,43 @@ Install ReductStore snap:
 sudo snap install reductstore
 ```
 
-Install `reductstore_agent` (better if snapped, but not available yet) and run it:
+Check that ReductStore is running:
+
+```bash
+curl http://127.0.0.1:8383/api/v1/info
+```
+
+For the `reductstore_agent`, you need to get the configuration file from the demo repository:
+
+```bash
+lxc file push ./config/reductstore-agent.yaml robot1/root/ros2_ws/config.yaml
+```
+
+Then install and run the `reductstore_agent`:
+
+```bash
+mkdir -p ~/ros2_ws/src
+cd ~/ros2_ws/src
+git clone https://github.com/reductstore/reductstore_agent.git
+cd ..
+
+# 2. Install system dependencies
+rosdep install --from-paths src --ignore-src -r -y
+
+# 3. Build your package
+colcon build --packages-select reductstore_agent
+
+# 4. Source the workspace and run your node
+source install/local_setup.bash
+```
+
+TODO: only way to install the Python SDK currently is with:
+
+```bash
+PIP_BREAK_SYSTEM_PACKAGES=1 pip3 install --ignore-installed reduct-py
+```
+
+And run the recorder with the configuration file:
 
 ```bash
 ros2 run reductstore_agent recorder --ros-args --params-file ./config.yaml
@@ -206,14 +254,61 @@ Run the bag play command in loop mode:
 ros2 bag play example-010-amr.mcap --loop
 ```
 
-Then you need to install some snaps on in the robot with the following script:
+You should see data being sent to ReductStore.
+
+## Install COS for robotics snap
+
+Exit the container shell:
 
 ```bash
-curl -L https://raw.githubusercontent.com/canonical/rob-cos-device-setup/main/setup-robcos-device.sh -O
+exit
+```
+
+First build the configuration snap for COS for robotics:
+
+```bash
+cd rob-cos-configuration
+snapcraft pack
+cd ..
+```
+
+Push the snap into the container as well as the setup script:
+
+```bash
+lxc file push ./rob-cos-configuration/rob-cos-demo-configuration*.snap robot1/root/
+lxc file push ./config/setup-robcos-device.sh robot1/root/
+```
+
+Access the container's shell again:
+
+```bash
+lxc exec robot1 -- /bin/bash
+```
+
+Then execute the script inside the container:
+
+```bash
 sudo bash setup-robcos-device.sh
 ```
 
-Enter the following URL when prompted: `http://192.168.178.220/cos-robotics-model`.
+Enter the following URL when prompted: `http://192.168.178.94/cos-robotics-model`.
+
+[More details about the setup script can be found in the tutorial](https://canonical-robotics.readthedocs-hosted.com/en/latest/how-to-guides/operation/write-configuration-snap-for-cos-for-robotics/).
+
+Note: to remove the device from the COS for robotics dashboard, you can run:
+
+```bash
+curl -v -X 'DELETE' 'http://192.168.178.94/cos-robotics-model-cos-registration-server/api/v1/devices/robot_1/'
+```
+
+```bash
+sudo snap remove rob-cos-grafana-agent
+sudo snap remove foxglove-bridge
+sudo snap remove ros2-exporter-agent
+sudo snap remove cos-registration-agent
+sudo snap remove rob-cos-data-sharing
+sudo snap remove rob-cos-demo-configuration
+```
 
 ## References
 
@@ -223,3 +318,4 @@ Enter the following URL when prompted: `http://192.168.178.220/cos-robotics-mod
 - [COS (Canonical Observability Stack) Lite](https://charmhub.io/topics/canonical-observability-stack/editions/lite)
 - [Packaging ROS 2 applications with snaps](https://canonical-robotics.readthedocs-hosted.com/en/latest/tutorials/)
 - [Prevent connectivity issues with LXD and Docker](https://documentation.ubuntu.com/lxd/latest/howto/network_bridge_firewalld/#prevent-connectivity-issues-with-lxd-and-docker)
+- [Traefik Charm Operator](https://github.com/canonical/traefik-k8s-operator)

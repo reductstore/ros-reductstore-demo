@@ -1,0 +1,7 @@
+{
+  "python.analysis.extraPaths": [
+    "reductstore-charm/src",
+    "reductstore-charm/lib"
+  ],
+  "python.analysis.diagnosticMode": "workspace"
+}
