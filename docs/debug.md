@@ -41,4 +41,69 @@
    ```bash
    sudo snap restart microk8s
    ```
-  
+
+## Managing applications with Juju
+
+You can manage your deployed applications using Juju commands. Here are some common tasks:
+
+- **Check application status:**
+
+  ```bash
+  juju status
+  ```
+
+- **Debug logs:**
+
+   First, the application needs to be configured to log at `DEBUG` level:
+
+   ```bash
+   juju config reductstore log-level=debug
+   ```
+
+   Check config:
+
+   ```bash
+   juju config reductstore log-level
+   ```
+
+   Then, to view real-time logs for all applications, use:
+
+   ```bash
+   juju debug-log
+   ```
+
+   for one application, use:
+
+   ```bash
+   juju debug-log --include reductstore --replay --level DEBUG
+   ```
+
+- **Scale an application:**
+
+  ```bash
+   juju add-unit <application-name> --num-units <number-of-units>
+   ```
+
+- **Remove an application:**
+
+   ```bash
+    juju remove-application <application-name>
+    ```
+
+- **Access application catalogue endpoint:**
+
+   ```bash
+   juju show-unit catalogue/0 --endpoint catalogue
+   ```
+
+- **Access application ingress endpoint:**
+
+   ```bash
+   juju show-unit reductstore/0 --endpoint ingress --app --format yaml
+   ```
+
+- **Check relations:**
+
+   ```bash
+   juju status --relations
+   ```

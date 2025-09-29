@@ -14,7 +14,7 @@ It allows deploying ReductStore into Kubernetes clusters with [Juju](https://juj
 ## 🏗️ Build the charm locally
 
 ```bash
-cd reductstore-charm
+cd reductstore-k8s
 charmcraft pack
 ```
 
@@ -25,6 +25,15 @@ reductstore_amd64.charm
 ```
 
 ## ☁️ Publish to Charmhub
+
+You need to be logged in to Charmhub with: 
+
+```bash
+charmcraft login
+charmcraft whoami
+```
+
+Then, follow these steps to publish your charm and its resources.
 
 ### 1. Register the charm name
 
@@ -46,20 +55,22 @@ charmcraft upload-resource reductstore-k8s reductstore-image --image=docker://do
 
 ### 4. Release to a channel
 
-```bash
-charmcraft release reductstore-k8s --revision <REV> --channel edge --resource reductstore-image:<RES_REV>
-```
-
 Check available revisions:
 
 ```bash
 charmcraft revisions reductstore-k8s
 ```
 
-Check available ressources:
+Check ressource revisions:
 
 ```bash
-charmcraft resources reductstore-k8s
+charmcraft resource-revisions reductstore-k8s reductstore-image
+```
+
+Then release a revision to a channel (e.g. `edge`):
+
+```bash
+charmcraft release reductstore-k8s --revision <REV> --channel edge --resource reductstore-image:<RES_REV>
 ```
 
 **ℹ️ Notes on revisions and channels**
@@ -93,4 +104,45 @@ Once released, users can deploy with:
 
 ```bash
 juju deploy reductstore-k8s --channel edge --trust
+```
+
+Or via the COS Lite overlay:
+
+```bash
+juju switch cos-robotics-model
+
+juju deploy cos-lite --trust --overlay ./config/demo-overlay.yaml
+```
+
+## Testing 
+
+To run the tests, first install `tox` if you don't have it yet:
+
+```bash
+pip install tox
+```
+
+Then, from the `reductstore-k8s` directory, set up the test environment:
+
+```bash
+tox -r
+```
+
+Then run the tests:
+
+```bash
+tox --parallel auto
+```
+
+Or run a specific test environment:
+
+```bash
+tox -e lint
+tox -e unit
+```
+
+List of available test environments:
+
+```bash
+tox -l
 ```

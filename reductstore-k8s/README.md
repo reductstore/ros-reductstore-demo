@@ -8,10 +8,10 @@ Avoid using this README file for information that is maintained or published els
 Use links instead.
 -->
 
-# reductstore-charm
+# reductstore-k8s
 
 Charmhub package name: operator-template
-More information: https://charmhub.io/reductstore-charm
+More information: https://charmhub.io/reductstore-k8s
 
 Describe your charm in one or two sentences.
 
