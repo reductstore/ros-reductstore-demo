@@ -7,12 +7,9 @@ summary: ReductStore is a time series object store for high-frequency unstructur
 description: |
   This charm deploys ReductStore inside Kubernetes, with persistent storage and ingress support.
 links:
-  website:
-    - https://www.reduct.store
-  documentation:
-    - https://www.reduct.store/docs
-  contact:
-    - mailto:info@reduct.store
+  website: https://www.reduct.store
+  documentation: https://www.reduct.store/docs
+  contact: mailto:info@reduct.store
 
 # Documentation:
 # https://canonical-charmcraft.readthedocs-hosted.com/en/stable/howto/build-guides/select-platforms/
