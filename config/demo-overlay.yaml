@@ -21,20 +21,6 @@ applications:
     scale: 1
     options:
       server-port: 8080
-    # constraints: arch=amd64
-
-  ros2bag-fileserver:
-    charm: ros2bag-fileserver-k8s
-    series: jammy
-    channel: edge
-    resources:
-      caddy-fileserver-image: ghcr.io/ubuntu-robotics/ros2bag-fileserver:dev
-    scale: 1
-    # constraints: arch=amd64
-    storage:
-      database: 10G
-    options:
-      ssh-port: 2222
 
   cos-registration-server:
     charm: cos-registration-server-k8s
@@ -43,7 +29,6 @@ applications:
     resources:
       cos-registration-server-image: cos-registration-server:local
     scale: 1
-    # constraints: arch=amd64
     storage:
       database: 1G
       

@@ -109,6 +109,8 @@ juju deploy reductstore-k8s --channel edge --trust
 Or via the COS Lite overlay:
 
 ```bash
+juju switch cos-robotics-model
+
 juju deploy cos-lite --trust --overlay ./config/demo-overlay.yaml
 ```
 

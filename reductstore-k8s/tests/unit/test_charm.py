@@ -118,12 +118,11 @@ def test_catalogue_updated_on_ingress_ready(monkeypatch):
     with ctx(ctx.on.relation_changed(ingress_rel), state_in) as mgr:
         out = mgr.run()
         charm = mgr.charm
-        expected_url = f"http://example.test/{out.model.name}-reductstore-k8s/ui/dashboard"
-        assert charm._stored.ingress_ui_url == expected_url
+        assert charm._stored.ingress_url == "http://example.test/"
         assert isinstance(out.unit_status, testing.ActiveStatus)
 
     assert len(seen) >= 1
-    assert seen[-1].url == expected_url
+    assert seen[-1].url == f"http://example.test/{out.model.name}-{charm.app.name}/ui/dashboard"
     assert seen[-1].name == "ReductStore"
 
 
@@ -146,8 +145,8 @@ def test_catalogue_cleared_on_ingress_revoked(monkeypatch):
 
     with ctx(ctx.on.relation_changed(ingress_rel), state) as mgr:
         state = mgr.run()
-        expected_url = f"http://example.test/{state.model.name}-reductstore-k8s/ui/dashboard"
-        assert mgr.charm._stored.ingress_ui_url == expected_url
+        charm = mgr.charm
+        assert mgr.charm._stored.ingress_url == "http://example.test/"
         assert isinstance(state.unit_status, testing.ActiveStatus)
 
     rel_in_state = state.get_relation(ingress_rel.id)
@@ -155,7 +154,7 @@ def test_catalogue_cleared_on_ingress_revoked(monkeypatch):
     with ctx(ctx.on.relation_broken(rel_in_state), state) as mgr:
         out = mgr.run()
         charm = mgr.charm
-        assert charm._stored.ingress_ui_url == ""
+        assert charm._stored.ingress_url == ""
         assert isinstance(out.unit_status, testing.MaintenanceStatus)
 
     assert len(seen) >= 2
