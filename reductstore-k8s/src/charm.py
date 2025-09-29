@@ -80,7 +80,10 @@ class ReductstoreCharm(ops.CharmBase):
                         "RS_PORT": "8383",
                         "RS_DATA_PATH": "/data",
                         "RS_LICENSE_PATH": str(self.model.config["license-path"] or ""),
-                        "RS_API_BASE_PATH":  str(self.model.config["api-base-path"] or f"/{self.model.name}-{self.app.name}")
+                        "RS_API_BASE_PATH": str(
+                            self.model.config["api-base-path"]
+                            or f"/{self.model.name}-{self.app.name}"
+                        ),
                     },
                 }
             },

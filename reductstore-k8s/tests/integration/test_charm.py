@@ -35,15 +35,13 @@ async def test_build_and_deploy(ops_test: OpsTest):
             charm,
             resources=resources,
             application_name=APP_NAME,
-            config={
-                "api-base-path": "/"
-            },
+            config={"api-base-path": "/"},
         ),
         ops_test.model.wait_for_idle(
             apps=[APP_NAME], status="active", raise_on_blocked=True, timeout=1000
         ),
     )
-    
+
     # API Check
     status = await ops_test.model.get_status()
     unit = status["applications"][APP_NAME]["units"][f"{APP_NAME}/0"]

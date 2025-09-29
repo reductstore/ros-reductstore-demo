@@ -13,7 +13,7 @@ from charm import ReductstoreCharm
 def test_reductstore_pebble_ready():
     ctx = testing.Context(ReductstoreCharm)
     container = testing.Container("reductstore", can_connect=True)
-    
+
     state_in = testing.State(containers={container})
 
     state_out = ctx.run(ctx.on.pebble_ready(container), state_in)
@@ -51,7 +51,7 @@ def test_config_changed_valid_can_connect():
     container = testing.Container("reductstore", can_connect=True)
     state_in = testing.State(
         containers={container},
-        config={"log-level": "debug", "license-path": "/custom.lic", "api-base-path": "/newbase"}
+        config={"log-level": "debug", "license-path": "/custom.lic", "api-base-path": "/newbase"},
     )
 
     state_out = ctx.run(ctx.on.config_changed(), state_in)
@@ -63,7 +63,7 @@ def test_config_changed_valid_can_connect():
         "RS_PORT": "8383",
         "RS_DATA_PATH": "/data",
         "RS_LICENSE_PATH": "/custom.lic",
-        "RS_API_BASE_PATH": "/newbase"
+        "RS_API_BASE_PATH": "/newbase",
     }
     assert state_out.unit_status == testing.ActiveStatus()
 
