@@ -11,6 +11,8 @@ applications:
     resources:
       reductstore-image: reduct/store:latest
     scale: 1
+    options:
+      log-level: debug
 
   foxglove-studio:
     charm: foxglove-studio-k8s

@@ -54,13 +54,28 @@ You can manage your deployed applications using Juju commands. Here are some com
 
 - **Debug logs:**
 
+   First, the application needs to be configured to log at `DEBUG` level:
+
+   ```bash
+   juju config reductstore log-level=debug
+   ```
+
+   Check config:
+
+   ```bash
+   juju config reductstore log-level
+   ```
+
+   Then, to view real-time logs for all applications, use:
+
    ```bash
    juju debug-log
    ```
+
    for one application, use:
 
    ```bash
-   juju debug-log --include reductstore
+   juju debug-log --include reductstore --replay --level DEBUG
    ```
 
 - **Scale an application:**
