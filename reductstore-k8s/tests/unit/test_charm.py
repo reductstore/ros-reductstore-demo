@@ -3,9 +3,13 @@
 #
 # Learn more about testing at: https://juju.is/docs/sdk/testing
 
+import json
+
 import ops
 import ops.pebble
+from charms.catalogue_k8s.v1.catalogue import CatalogueConsumer
 from ops import testing
+from ops.testing import Relation, State
 
 from charm import ReductstoreCharm
 
@@ -92,3 +96,67 @@ def test_config_changed_invalid():
 
     assert isinstance(state_out.unit_status, testing.BlockedStatus)
     assert invalid_level in state_out.unit_status.message
+
+
+def test_catalogue_updated_on_ingress_ready(monkeypatch):
+    seen = []
+
+    def fake_update(self, item):
+        seen.append(item)
+
+    monkeypatch.setattr(CatalogueConsumer, "update_item", fake_update, raising=True)
+
+    ctx = testing.Context(ReductstoreCharm)
+    container = testing.Container("reductstore", can_connect=True)
+    ingress_rel = Relation(
+        "ingress",
+        remote_app_name="traefik",
+        remote_app_data={"ingress": json.dumps({"url": "http://example.test"})},
+    )
+    state_in = State(containers={container}, relations={ingress_rel}, leader=True)
+
+    with ctx(ctx.on.relation_changed(ingress_rel), state_in) as mgr:
+        out = mgr.run()
+        charm = mgr.charm
+        expected_url = f"http://example.test/{out.model.name}-reductstore-k8s/ui/dashboard"
+        assert charm._stored.ingress_ui_url == expected_url
+        assert isinstance(out.unit_status, testing.ActiveStatus)
+
+    assert len(seen) >= 1
+    assert seen[-1].url == expected_url
+    assert seen[-1].name == "ReductStore"
+
+
+def test_catalogue_cleared_on_ingress_revoked(monkeypatch):
+    seen = []
+
+    def fake_update(self, item):
+        seen.append(item)
+
+    monkeypatch.setattr(CatalogueConsumer, "update_item", fake_update, raising=True)
+
+    ctx = testing.Context(ReductstoreCharm)
+    container = testing.Container("reductstore", can_connect=True)
+    ingress_rel = Relation(
+        "ingress",
+        remote_app_name="traefik",
+        remote_app_data={"ingress": json.dumps({"url": "http://example.test"})},
+    )
+    state = State(containers={container}, relations={ingress_rel}, leader=True)
+
+    with ctx(ctx.on.relation_changed(ingress_rel), state) as mgr:
+        state = mgr.run()
+        expected_url = f"http://example.test/{state.model.name}-reductstore-k8s/ui/dashboard"
+        assert mgr.charm._stored.ingress_ui_url == expected_url
+        assert isinstance(state.unit_status, testing.ActiveStatus)
+
+    rel_in_state = state.get_relation(ingress_rel.id)
+
+    with ctx(ctx.on.relation_broken(rel_in_state), state) as mgr:
+        out = mgr.run()
+        charm = mgr.charm
+        assert charm._stored.ingress_ui_url == ""
+        assert isinstance(out.unit_status, testing.MaintenanceStatus)
+
+    assert len(seen) >= 2
+    assert seen[-1].url == ""

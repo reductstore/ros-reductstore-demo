@@ -111,3 +111,36 @@ Or via the COS Lite overlay:
 ```bash
 juju deploy cos-lite --trust --overlay ./config/demo-overlay.yaml
 ```
+
+## Testing 
+
+To run the tests, first install `tox` if you don't have it yet:
+
+```bash
+pip install tox
+```
+
+Then, from the `reductstore-k8s` directory, set up the test environment:
+
+```bash
+tox -r
+```
+
+Then run the tests:
+
+```bash
+tox --parallel auto
+```
+
+Or run a specific test environment:
+
+```bash
+tox -e lint
+tox -e unit
+```
+
+List of available test environments:
+
+```bash
+tox -l
+```

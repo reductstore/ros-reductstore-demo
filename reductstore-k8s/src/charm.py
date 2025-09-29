@@ -4,6 +4,7 @@
 
 import logging
 from typing import cast
+from urllib.parse import urlsplit, urlunsplit
 
 import ops
 from charms.catalogue_k8s.v1.catalogue import CatalogueConsumer, CatalogueItem
@@ -28,7 +29,7 @@ class ReductstoreCharm(ops.CharmBase):
         super().__init__(framework)
 
         # Persist last known ingress URL
-        self._stored.set_default(ingress_url="")
+        self._stored.set_default(ingress_ui_url="")
 
         # Observe pebble + config
         framework.observe(self.on["reductstore"].pebble_ready, self._on_reductstore_pebble_ready)
@@ -67,26 +68,42 @@ class ReductstoreCharm(ops.CharmBase):
         self.catalogue.update_item(self._catalogue_item)
 
     def _on_ingress_ready(self, event: IngressPerAppReadyEvent):
-        self._stored.ingress_url = event.url
+        self._stored.ingress_ui_url = self._public_ui_url(event.url)
         self.catalogue.update_item(self._catalogue_item)
         logger.info("Ingress is ready: %s", event.url)
         self.unit.status = ops.ActiveStatus(f"Ingress at {event.url}")
 
     def _on_ingress_revoked(self, event: IngressPerAppRevokedEvent):
-        self._stored.ingress_url = ""
+        self._stored.ingress_ui_url = ""
         self.catalogue.update_item(self._catalogue_item)
         logger.warning("Ingress revoked")
         self.unit.status = ops.MaintenanceStatus("Waiting for ingress")
 
+    def _api_base_path(self) -> str:
+        path = cast(
+            str, self.model.config.get("api-base-path") or f"/{self.model.name}-{self.app.name}"
+        )
+        if path and not path.startswith("/"):
+            path = "/" + path
+        if len(path) > 1 and path.endswith("/"):
+            path = path[:-1]
+        return path
+
+    def _public_ui_url(self, base_url: str) -> str:
+        parts = urlsplit(base_url)
+        path = self._api_base_path()
+        path = path + "/ui/dashboard"
+        return urlunsplit((parts.scheme, parts.netloc, path or "/", "", ""))
+
     @property
-    def external_url(self) -> str:
-        return self._stored.ingress_url or ""
+    def external_ui_url(self) -> str:
+        return self._stored.ingress_ui_url or ""
 
     @property
     def _catalogue_item(self) -> CatalogueItem:
         return CatalogueItem(
             name="ReductStore",
-            url=self.external_url,
+            url=self.external_ui_url,
             icon="database",
             description=(
                 "ReductStore is a time series object store for high-frequency unstructured data."
@@ -110,10 +127,7 @@ class ReductstoreCharm(ops.CharmBase):
                         "RS_PORT": "8383",
                         "RS_DATA_PATH": "/data",
                         "RS_LICENSE_PATH": str(self.model.config["license-path"] or ""),
-                        "RS_API_BASE_PATH": str(
-                            self.model.config["api-base-path"]
-                            or f"/{self.model.name}-{self.app.name}"
-                        ),
+                        "RS_API_BASE_PATH": self._api_base_path(),
                     },
                 }
             },
