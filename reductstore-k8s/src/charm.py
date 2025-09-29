@@ -2,6 +2,8 @@
 # Copyright 2025 anthony
 # See LICENSE file for licensing details.
 
+"""Kubernetes charm for ReductStore."""
+
 import logging
 from typing import cast
 from urllib.parse import urlsplit, urlunsplit
@@ -97,6 +99,7 @@ class ReductstoreCharm(ops.CharmBase):
 
     @property
     def external_ui_url(self) -> str:
+        """Return the externally reachable UI URL, if known."""
         return self._stored.ingress_ui_url or ""
 
     @property
