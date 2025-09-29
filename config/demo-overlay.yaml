@@ -49,13 +49,10 @@ applications:
       
 relations:
   - [reductstore:ingress, traefik:ingress]
+  - [reductstore:catalogue, catalogue:catalogue]
   - [foxglove-studio:ingress, traefik:ingress]
   - [foxglove-studio:catalogue, catalogue:catalogue]
-  - [ros2bag-fileserver:ingress-tcp, traefik:ingress-per-unit]
-  - [ros2bag-fileserver:ingress-http, traefik:ingress]
-  - [ros2bag-fileserver:catalogue, catalogue:catalogue]
   - [cos-registration-server:ingress, traefik:ingress]
   - [cos-registration-server:catalogue, catalogue:catalogue]
-  - [cos-registration-server:auth-devices-keys,  ros2bag-fileserver:auth-devices-keys]
   - [grafana:grafana-dashboard, cos-registration-server:grafana-dashboard]
   - [grafana:grafana-dashboard, cos-registration-server:grafana-dashboard-devices]
