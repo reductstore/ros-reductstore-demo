@@ -2,3 +2,5 @@ jupyterlab
 reduct-py
 mcap
 mcap-ros2-support
+pillow
+matplotlib

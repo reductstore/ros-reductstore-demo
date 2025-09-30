@@ -78,6 +78,12 @@ You can manage your deployed applications using Juju commands. Here are some com
    juju debug-log --include reductstore --replay --level DEBUG
    ```
 
+   Or directly access the logs of a specific unit:
+
+   ```bash
+   microk8s kubectl logs -c reductstore reductstore-0 -n cos-robotics-model -f
+   ```
+
 - **Scale an application:**
 
   ```bash
