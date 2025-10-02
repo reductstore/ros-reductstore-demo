@@ -70,7 +70,21 @@ charmcraft resource-revisions reductstore-k8s reductstore-image
 Then release a revision to a channel (e.g. `edge`):
 
 ```bash
-charmcraft release reductstore-k8s --revision <REV> --channel edge --resource reductstore-image:<RES_REV>
+charmcraft release reductstore-k8s \
+  --revision <REV> \
+  --channel edge \
+  --resource reductstore-image:<RES_REV> \
+  --resource reductstore-license:<RES_REV>
+```
+
+For example:
+
+```bash
+charmcraft release reductstore-k8s \
+  --revision 12 \
+  --channel edge \
+  --resource reductstore-image:1 \
+  --resource reductstore-license:2
 ```
 
 **ℹ️ Notes on revisions and channels**

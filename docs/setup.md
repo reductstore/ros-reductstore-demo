@@ -79,6 +79,12 @@ curl -L https://raw.githubusercontent.com/ubuntu-robotics/rob-cos-overlay/main/r
 juju deploy cos-lite --trust --overlay ./config/demo-overlay.yaml
 ```
 
+To attache a license for ReductStore, you can use:
+
+```bash
+juju attach-resource reductstore reductstore-license=/path/to/reduct.lic
+```
+
 Find the IP address and path of the dashboard's Traefik endpoint with:
 
 ```bash
