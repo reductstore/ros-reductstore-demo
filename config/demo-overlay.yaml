@@ -10,6 +10,7 @@ applications:
     trust: true
     resources:
       reductstore-image: reduct/store:latest
+      # reductstore-license: /path/to/reduct.lic
     scale: 1
     options:
       log-level: debug

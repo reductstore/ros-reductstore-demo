@@ -1,7 +1,5 @@
 {
   "python.analysis.extraPaths": [
-    "reductstore-k8s/src",
-    "reductstore-k8s/lib",
     "/opt/ros/jazzy/lib/python3.12/site-packages",
     "${workspaceFolder}/.venv/lib/python3.12/site-packages"
   ],
