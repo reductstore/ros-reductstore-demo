@@ -9,7 +9,7 @@ applications:
     channel: edge
     trust: true
     resources:
-      reductstore-image: reduct/store:latest
+      reductstore-image: reduct/store:main
       # reductstore-license: /path/to/reduct.lic
     scale: 1
     options:
