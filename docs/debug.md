@@ -75,7 +75,9 @@ You can manage your deployed applications using Juju commands. Here are some com
    for one application, use:
 
    ```bash
-   juju debug-log --include reductstore --replay --level DEBUG
+   juju debug-log --debug --include reductstore
+
+   juju debug-log --debug --include-module unit.reductstore/0.juju-log --replay
    ```
 
    Or directly access the logs of a specific unit:
@@ -112,4 +114,22 @@ You can manage your deployed applications using Juju commands. Here are some com
 
    ```bash
    juju status --relations
+   ```
+
+   Remove the existing relation:
+
+   ```bash
+   juju remove-relation reductstore:catalogue catalogue:catalogue
+   ```
+
+   Re-add it:
+
+   ```bash
+   juju relate reductstore:catalogue catalogue:catalogue
+   ```
+
+- **Scale to zero units:**
+
+   ```bash
+   juju scale-application traefik 0
    ```
