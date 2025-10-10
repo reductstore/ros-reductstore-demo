@@ -81,10 +81,10 @@ For example:
 
 ```bash
 charmcraft release reductstore-k8s \
-  --revision 12 \
+  --revision 13 \
   --channel edge \
-  --resource reductstore-image:1 \
-  --resource reductstore-license:2
+  --resource reductstore-image:2 \
+  --resource reductstore-license:1
 ```
 
 **ℹ️ Notes on revisions and channels**

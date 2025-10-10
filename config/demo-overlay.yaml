@@ -4,6 +4,13 @@ applications:
     options:
       routing_mode: path
 
+  grafana:
+    resources:
+      grafana-image: ghcr.io/reductstore/grafana:dev
+
+    options:
+      allow_anonymous_access: true # For demo purposes only
+
   reductstore:
     charm: reductstore-k8s
     channel: edge
