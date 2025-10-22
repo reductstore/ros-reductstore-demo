@@ -110,6 +110,52 @@ Username is `admin`. Get the password with:
 juju run grafana/0 get-admin-password
 ```
 
+## Update Grafana image
+
+First check the available Grafana resources with:
+
+```bash
+juju resources grafana
+```
+
+Then update the Grafana image resource with:
+
+```bash
+juju attach-resource grafana grafana-image=ghcr.io/reductstore/grafana:v0.1.1
+```
+
+Then watch the rolling update:
+
+```bash
+juju status --watch 1s
+```
+
+## Update ReductStore image
+
+First check the available ReductStore resources with:
+
+```bash
+juju resources reductstore
+```
+
+Then update the ReductStore image resource with:
+
+```bash
+juju attach-resource reductstore reductstore-image=reduct/store:v1.17.0
+```
+
+You also need to attach the license again after updating the image:
+
+```bash
+juju attach-resource reductstore reductstore-license=/path/to/reduct.lic
+```
+
+Then watch the rolling update:
+
+```bash
+juju status --watch 1s
+```
+
 ## Use LXD to simulate robots
 
 [LXD](https://canonical.com/lxd) will be used to simulate multiple robots on a single machine.

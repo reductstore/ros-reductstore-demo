@@ -21,7 +21,7 @@ log = logging.getLogger("mcap_to_reduct")
 
 # ---------------------- Config ----------------------
 MCAP_INPUT_PATH = "./data/example-010-amr.mcap"
-REDUCT_URL = "http://192.168.178.94/cos-robotics-model-reductstore"
+REDUCT_URL = "http://192.168.178.243/cos-robotics-model-reductstore"
 API_TOKEN = "reductstore"
 BUCKET = "autonomous_mobile_robot"
 
