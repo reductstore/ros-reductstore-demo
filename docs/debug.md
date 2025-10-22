@@ -1,3 +1,22 @@
+# 🧩 MicroK8s + Juju Offline Setup (Standalone, No Router)
+
+Your MicroK8s + Juju environment runs fully **offline**, using a **dummy interface** (`dummy0`) to keep Kubernetes stable even without internet.
+This document summarizes setup details, recovery steps, and debugging procedures.
+
+---
+
+## Network Overview
+
+| Component       | Purpose                    | Interface                 | Address        |
+| --------------- | -------------------------- | ------------------------- | -------------- |
+| Host Node       | MicroK8s + Juju controller | `enp1s0` (wired)          | 192.168.178.94 |
+| Dummy Interface | Fallback when offline      | `dummy0`                  | 192.168.178.94 |
+| Host Alias      | Local DNS name             | `/etc/hosts → demo.local` |                |
+| API Server      | Kubernetes control plane   | Port 16443                |                |
+| Kubelet         | Node agent                 | Port 10250                |                |
+
+---
+
 ## Restarting MicroK8s + Juju after Reboot
 
 1. **Check MicroK8s status**
@@ -21,115 +40,204 @@
    microk8s kubectl get pods -A
    ```
 
-   All pods from Juju workloads should start automatically.
+   * All Juju workloads should show as `Running`.
 
-3. **Check Juju services**
+3. **Check Juju controller and workloads**
 
    ```bash
    juju status
    ```
 
    * `active/idle` = everything is good.
-   * If something is stuck, Juju will usually resolve it automatically; otherwise run:
+   * If it hangs or fails with `no route to host`, reapply the dummy route:
 
      ```bash
-     juju debug-log
+     sudo ip route replace default dev dummy0 metric 500
      ```
 
-4. **(Optional) Restart all MicroK8s services**
+4. **Restart MicroK8s if needed**
 
    ```bash
    sudo snap restart microk8s
    ```
 
-## Managing applications with Juju
+---
 
-You can manage your deployed applications using Juju commands. Here are some common tasks:
+## Recovering Network Connectivity
 
-- **Check application status:**
+### When switching **from Ethernet to Wi-Fi**
+
+If you see:
+
+```
+dial tcp 192.168.178.94:10250: connect: no route to host
+```
+
+Re-add a route for the cluster interface:
+
+```bash
+sudo ip addr add 192.168.178.94/24 dev dummy0
+sudo ip route replace default dev dummy0 metric 500
+```
+
+Kubernetes will immediately reconnect and Juju should recover.
+
+### When Ethernet (enp1s0) is unplugged
+
+Keep your dummy interface up — it provides a logical “anchor” for K8s to bind to:
+
+```bash
+ip link show dummy0
+```
+
+If it’s missing:
+
+```bash
+sudo systemctl restart dummy-net.service
+```
+
+### When internet doesn’t work while online
+
+Check that your **dummy route has higher metric** (lower priority):
+
+```bash
+ip route show default
+# Good example:
+# default via 192.168.178.1 dev enp1s0 proto dhcp metric 100
+# default dev dummy0 scope link metric 500
+```
+
+If not, fix it:
+
+```bash
+sudo ip route replace default dev dummy0 metric 500
+```
+
+---
+
+## Debugging Common Issues
+
+| Symptom                                                            | Likely Cause                  | Fix                                                   |              |
+| ------------------------------------------------------------------ | ----------------------------- | ----------------------------------------------------- | ------------ |
+| `no route to host`                                                 | Lost default route            | `sudo ip route replace default dev dummy0 metric 500` |              |
+| `tls: certificate is valid for 192.168.178.94, not 192.168.178.95` | Switched network              | Use `demo.local` or reissue certs with new SANs       |              |                                   |
+| Internet gone when plugging cable                                  | Dummy route priority too high | Add `metric 500` to dummy route                       |              |
+| Dummy interface missing after reboot                               | Service not enabled           | `sudo systemctl enable --now dummy-net.service`       |              |
+
+---
+
+## Managing Applications with Juju
+
+* **List deployed applications**
 
   ```bash
   juju status
   ```
 
-- **Debug logs:**
-
-   First, the application needs to be configured to log at `DEBUG` level:
-
-   ```bash
-   juju config reductstore log-level=debug
-   ```
-
-   Check config:
-
-   ```bash
-   juju config reductstore log-level
-   ```
-
-   Then, to view real-time logs for all applications, use:
-
-   ```bash
-   juju debug-log
-   ```
-
-   for one application, use:
-
-   ```bash
-   juju debug-log --debug --include reductstore
-
-   juju debug-log --debug --include-module unit.reductstore/0.juju-log --replay
-   ```
-
-   Or directly access the logs of a specific unit:
-
-   ```bash
-   microk8s kubectl logs -c reductstore reductstore-0 -n cos-robotics-model -f
-   ```
-
-- **Scale an application:**
+* **View Juju logs**
 
   ```bash
-   juju add-unit <application-name> --num-units <number-of-units>
-   ```
+  juju debug-log
+  ```
 
-- **Remove an application:**
+  Filter for one application:
 
-   ```bash
-    juju remove-application <application-name>
-    ```
+  ```bash
+  juju debug-log --debug --include reductstore
+  ```
 
-- **Access application catalogue endpoint:**
+* **Access container logs**
 
-   ```bash
-   juju show-unit catalogue/0 --endpoint catalogue
-   ```
+  ```bash
+  microk8s kubectl logs -n cos-robotics-model -l app.kubernetes.io/name=reductstore -f
+  ```
 
-- **Access application ingress endpoint:**
+* **Scale an application**
 
-   ```bash
-   juju show-unit reductstore/0 --endpoint ingress --app --format yaml
-   ```
+  ```bash
+  juju add-unit <app-name> --num-units <n>
+  ```
 
-- **Check relations:**
+* **Remove an application**
 
-   ```bash
-   juju status --relations
-   ```
+  ```bash
+  juju remove-application <app-name>
+  ```
 
-   Remove the existing relation:
+* **Inspect relations**
 
-   ```bash
-   juju remove-relation reductstore:catalogue catalogue:catalogue
-   ```
+  ```bash
+  juju status --relations
+  juju remove-relation reductstore:catalogue catalogue:catalogue
+  juju relate reductstore:catalogue catalogue:catalogue
+  ```
 
-   Re-add it:
+* **Scale to zero**
 
-   ```bash
-   juju relate reductstore:catalogue catalogue:catalogue
-   ```
+  ```bash
+  juju scale-application traefik 0
+  ```
 
-- **Scale to zero units:**
+---
 
-   ```bash
-   juju scale-application traefik 0
-   ```
+## Dummy Interface Reference
+
+Show dummy interface details:
+
+```bash
+ip addr show dummy0
+ip route show default
+```
+
+### Create manually
+
+```bash
+sudo modprobe dummy
+sudo ip link add dummy0 type dummy
+sudo ip addr add 192.168.178.94/24 dev dummy0
+sudo ip link set dummy0 up
+sudo ip route replace default dev dummy0 metric 500
+```
+
+### Persistent systemd service
+
+```ini
+# /etc/systemd/system/dummy-net.service
+[Unit]
+Description=Persistent dummy interface for airgapped K8s
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/sbin/modprobe dummy
+ExecStart=/sbin/ip link add dummy0 type dummy
+ExecStart=/sbin/ip addr add 192.168.178.94/24 dev dummy0
+ExecStart=/sbin/ip link set dummy0 up
+ExecStart=/sbin/ip route replace default dev dummy0 metric 500
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+```
+
+---
+
+## Verifying Everything
+
+```bash
+# Check network routes
+ip route | grep default
+
+# Check cluster health
+microk8s status --wait-ready
+
+# Check kubelet and apiserver ports
+sudo ss -lntp | grep -E ':16443|:10250'
+
+# Check kubelet health
+curl -k https://demo.local:10250/healthz
+
+# Check workloads
+juju status
+```
