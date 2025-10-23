@@ -16,6 +16,26 @@ With Docker Compose, you can run a simplified version of the demo on a single ma
 - http://foxglove.reduct.demo
 - http://traefik.reduct.demo
 
+To start the demo, run:
+
+```bash
+docker compose pull
+docker compose up -d
+```
+
+To update a certain service only, run:
+
+```bash
+docker compose pull <service-name>
+docker compose up -d <service-name>
+```
+If the configuration hasen't changed, you can also use `--force-recreate` to restart a service:
+
+```bash
+docker compose up -d --force-recreate <service-name>
+```
+
+
 ## Demo with COS Lite and ReductStore
 
 MicroK8s is used to run a local Kubernetes cluster on a single machine (e.g., a laptop or server). Juju is used to deploy and manage applications on the Kubernetes cluster. 

@@ -16,8 +16,6 @@ from io import BytesIO
 from collections import defaultdict
 
 import rosbag2_py
-from rclpy.serialization import deserialize_message, serialize_message
-from rosidl_runtime_py.utilities import get_message
 from tqdm import tqdm
 
 from reduct import Client
@@ -40,20 +38,21 @@ class Config:
     MCAP_INPUT_PATH: str = "./data/example-010-amr.mcap"
 
     # Target robot endpoint & bucket
-    REDUCT_URL: str = "http://cloud.reduct.demo"  # e.g. http://orion.field.demo
+    # REDUCT_URL: str = "http://cloud.reduct.demo"
+    REDUCT_URL: str = f"http://orion.field.demo"
     API_TOKEN: str = "reductstore"
-    BUCKET: str = "orion"  # bucket equals robot name
+    BUCKET: str = "mcap"
 
     # Session plan: 10-min sessions, spaced out, covering past→future window
     CLIP_SECONDS: float = 30.0
     SESSION_DURATION_SECONDS: int = 10 * 60
-    SESSION_INTERVAL_SECONDS: int = 18 * 60 * 60  # start a session every 18 hours
+    SESSION_INTERVAL_SECONDS: int = 24 * 60 * 60  # start a session every 24 hours
     START_OFFSET: timedelta = timedelta(days=-1)
-    END_OFFSET: timedelta = timedelta(days=+0)
+    END_OFFSET: timedelta = timedelta(days=+8)
 
     # MCAP Episode settings
     EPISODE_DURATION_SECONDS: float = 30.0  # Duration of each MCAP episode
-    ENTRY_NAME: str = "mcap_episodes"  # Single entry name for all MCAP files
+    ENTRY_NAME: str = "episodes"  # Single entry name for all MCAP files
 
     # Keep all topics but with downsampling
     SAVE_ALL_TOPICS: bool = True
@@ -479,7 +478,9 @@ async def clear_bucket():
     async with Client(CFG.REDUCT_URL, api_token=CFG.API_TOKEN, timeout=600) as client:
         bucket = await client.create_bucket(CFG.BUCKET, exist_ok=True)
         for e in await bucket.get_entry_list():
-            await bucket.remove_entry(e.name)
+            if e.name == CFG.ENTRY_NAME:
+                log.info("Removing entry '%s'...", e.name)
+                await bucket.remove_entry(CFG.ENTRY_NAME)
 
 
 # ---------------------- Time utilities ----------------------

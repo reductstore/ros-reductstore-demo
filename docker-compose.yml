@@ -64,11 +64,11 @@ services:
       RS_BUCKET_ATLAS_NAME: atlas
       RS_BUCKET_NOVA_NAME: nova
       RS_BUCKET_ORION_QUOTA_TYPE: FIFO
-      RS_BUCKET_ORION_QUOTA_SIZE: 50Gb
+      RS_BUCKET_ORION_QUOTA_SIZE: 20Gb
       RS_BUCKET_ATLAS_QUOTA_TYPE: FIFO
-      RS_BUCKET_ATLAS_QUOTA_SIZE: 50Gb
+      RS_BUCKET_ATLAS_QUOTA_SIZE: 20Gb
       RS_BUCKET_NOVA_QUOTA_TYPE: FIFO
-      RS_BUCKET_NOVA_QUOTA_SIZE: 50Gb
+      RS_BUCKET_NOVA_QUOTA_SIZE: 20Gb
       RS_TOKEN_GRAFANA_NAME: grafana
       RS_TOKEN_GRAFANA_VALUE: grafana-read-token
       RS_TOKEN_GRAFANA_READ: orion,atlas,nova
@@ -99,7 +99,7 @@ services:
       RS_LICENSE_PATH: /licenses/reduct.lic
       RS_BUCKET_TEL_NAME: orion
       RS_BUCKET_TEL_QUOTA_TYPE: FIFO
-      RS_BUCKET_TEL_QUOTA_SIZE: 20Gb
+      RS_BUCKET_TEL_QUOTA_SIZE: 10Gb
 
       # --- R1: Downsample images to 1 fps (always-on gate via $each_t) ---
       RS_REPLICATION_R1_NAME: orion-image-1fps
@@ -190,7 +190,7 @@ services:
       RS_LICENSE_PATH: /licenses/reduct.lic
       RS_BUCKET_TEL_NAME: atlas
       RS_BUCKET_TEL_QUOTA_TYPE: FIFO
-      RS_BUCKET_TEL_QUOTA_SIZE: 20Gb
+      RS_BUCKET_TEL_QUOTA_SIZE: 10Gb
 
       RS_REPLICATION_R1_NAME: atlas-image-1fps
       RS_REPLICATION_R1_SRC_BUCKET: atlas
@@ -274,7 +274,7 @@ services:
       RS_LICENSE_PATH: /licenses/reduct.lic
       RS_BUCKET_TEL_NAME: nova
       RS_BUCKET_TEL_QUOTA_TYPE: FIFO
-      RS_BUCKET_TEL_QUOTA_SIZE: 20Gb
+      RS_BUCKET_TEL_QUOTA_SIZE: 10Gb
 
       RS_REPLICATION_R1_NAME: nova-image-1fps
       RS_REPLICATION_R1_SRC_BUCKET: nova

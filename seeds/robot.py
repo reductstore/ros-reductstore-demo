@@ -38,16 +38,16 @@ class Config:
     MCAP_INPUT_PATH: str = "./data/example-010-amr.mcap"
 
     # Target robot endpoint & bucket
-    BUCKET: str = "atlas"  # bucket equals robot name
+    BUCKET: str = "atlas"  # orion, nova, or atlas
     REDUCT_URL: str = f"http://{BUCKET}.field.demo"
     API_TOKEN: str = "reductstore"
 
     # Session plan: 10-min sessions, spaced out, covering past→future window
     CLIP_SECONDS: float = 30.0
     SESSION_DURATION_SECONDS: int = 10 * 60
-    SESSION_INTERVAL_SECONDS: int = 18 * 60 * 60  # start a session every 18 hours
-    START_OFFSET: timedelta = timedelta(days=-1)
-    END_OFFSET: timedelta = timedelta(days=+0)
+    SESSION_INTERVAL_SECONDS: int = 13 * 60 * 60  # start a session every 13 hours
+    START_OFFSET: timedelta = timedelta(days=-30)
+    END_OFFSET: timedelta = timedelta(days=+7)
 
     # Save rules
     SAVE_IMAGES: bool = True  # keep JPEG/PNG only, rotated -90°
@@ -165,6 +165,24 @@ def get_json_entry_name(topic: str) -> str:
         return topic_mapping[topic]
     else:
         return "json__" + topic.lstrip("/").replace("/", "_")
+
+
+def get_all_entries_to_flush() -> List[str]:
+    entries = [
+        IMAGE_ENTRY,
+        POINTCLOUD_ENTRY,
+    ]
+    # Add JSON entries for allowed topics
+    for topic in CFG.ALLOWED_CAMERA_INFO_TOPICS:
+        entries.append(get_json_entry_name(topic))
+    for topic in [
+        "/vectornav/IMU_restamped",
+        "/vectornav/Mag_restamped",
+        "/vectornav/Pres_restamped",
+        "/vectornav/Temp_restamped",
+    ]:
+        entries.append(get_json_entry_name(topic))
+    return entries
 
 
 def flatten_row(topic: str, topic_type: str, msg, t_ns: int):
@@ -376,7 +394,9 @@ async def clear_bucket():
     async with Client(CFG.REDUCT_URL, api_token=CFG.API_TOKEN, timeout=600) as client:
         bucket = await client.create_bucket(CFG.BUCKET, exist_ok=True)
         for e in await bucket.get_entry_list():
-            await bucket.remove_entry(e.name)
+            if e.name in get_all_entries_to_flush():
+                log.info("Removing entry '%s'...", e.name)
+                await bucket.remove_entry(e.name)
 
 
 # ---------------------- Time utilities ----------------------
