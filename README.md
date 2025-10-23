@@ -4,7 +4,19 @@ Demonstrate how [ReductStore](https://www.reduct.store) integrates with the [Can
 
 See demo's [setup instructions](docs/setup.md) for installing MicroK8s, Juju, COS Lite, ReductStore, and demo applications.
 
-## Overview
+## Demo with Docker Compose
+
+With Docker Compose, you can run a simplified version of the demo on a single machine without Kubernetes:
+
+- http://cloud.reduct.demo
+- http://orion.field.demo
+- http://atlas.field.demo
+- http://nova.field.demo
+- http://grafana.reduct.demo
+- http://foxglove.reduct.demo
+- http://traefik.reduct.demo
+
+## Demo with COS Lite and ReductStore
 
 MicroK8s is used to run a local Kubernetes cluster on a single machine (e.g., a laptop or server). Juju is used to deploy and manage applications on the Kubernetes cluster. 
 
@@ -20,21 +32,9 @@ LXD containers simulate multiple robots on the same machine, each running a ROS 
 - **Browsing Dashboard** – Minimal web demo to explore stored data.
 - **Registration Server** – Integrates robots into COS catalogue.
 
-## Demo Flow
 
-1. **Robot (LXD container snapshot)** plays back an MCAP file using `ros2 bag play`.
-2. **reductstore_agent** records selected topics and uploads MCAPs and telemetry into ReductStore.
-3. **ReductStore server** stores the data and can replicate it to a central archive or cloud storage.
-4. **COS Registration** exposes robot metrics and logs into the COS dashboard.
-5. **Foxglove Studio** connects to visualize ROS topics.
-6. **Jupyter Notebook & Browsing Dashboard** show how to query and visualize stored data.
 
-## Goals
 
-- Provide a reproducible demo setup for robotics data pipelines.
-- Show how ReductStore fits into an observability stack with COS Lite.
-- Demonstrate integrations with MCAP, ROS 2, Foxglove, and Jupyter.
-- Enable replication of robot-collected data to a central or cloud environment.
 
 ## References
 

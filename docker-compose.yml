@@ -1,0 +1,225 @@
+name: ${PROJECT_NAME}
+
+networks:
+  reductnet:
+    name: ${NETWORK_NAME}
+    driver: bridge
+
+volumes:
+  grafana-data:
+
+services:
+  traefik:
+    image: traefik:v3.1
+    container_name: traefik
+    restart: unless-stopped
+    networks: [reductnet]
+    command:
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.network=${NETWORK_NAME}"
+      - "--entrypoints.web.address=:80"
+      - "--api.dashboard=true"
+    ports:
+      - "80:80"
+      - "8081:8080"
+    depends_on:
+      - cloud
+      - grafana
+      - foxglove
+      - robot-orion
+      - robot-atlas
+      - robot-nova
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dashboard.rule=Host(`traefik.reduct.demo`)"
+      - "traefik.http.routers.dashboard.entrypoints=web"
+      - "traefik.http.routers.dashboard.service=api@internal"
+
+  cloud:
+    image: ${REDUCT_IMAGE}
+    container_name: cloud
+    restart: unless-stopped
+    networks: [reductnet]
+    hostname: ${CLOUD_HOST}
+    environment:
+      RS_HOST: 0.0.0.0
+      RS_PORT: 8383
+      RS_API_BASE_PATH: /
+      RS_PUBLIC_URL: "http://cloud.reduct.demo/"
+      RS_CORS_ALLOW_ORIGIN: "*"
+      RS_DATA_PATH: /data
+      RS_API_TOKEN: ${CLOUD_API_TOKEN}
+      RS_LICENSE_PATH: /licenses/reduct.lic
+      RS_BUCKET_ORION_NAME: orion
+      RS_BUCKET_ATLAS_NAME: atlas
+      RS_BUCKET_NOVA_NAME: nova
+      RS_BUCKET_ORION_QUOTA_TYPE: FIFO
+      RS_BUCKET_ORION_QUOTA_SIZE: 50Gb
+      RS_BUCKET_ATLAS_QUOTA_TYPE: FIFO
+      RS_BUCKET_ATLAS_QUOTA_SIZE: 50Gb
+      RS_BUCKET_NOVA_QUOTA_TYPE: FIFO
+      RS_BUCKET_NOVA_QUOTA_SIZE: 50Gb
+      RS_TOKEN_GRAFANA_NAME: grafana
+      RS_TOKEN_GRAFANA_VALUE: grafana-read-token
+      RS_TOKEN_GRAFANA_READ: orion,atlas,nova
+    volumes:
+      - ${HOST_DATA_CLOUD}:/data
+      - ${HOST_LICENSE_PATH}:/licenses/reduct.lic:ro
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.cloud.rule=Host(`cloud.reduct.demo`)"
+      - "traefik.http.routers.cloud.entrypoints=web"
+      - "traefik.http.services.cloud.loadbalancer.server.port=8383"
+
+  robot-orion:
+    image: ${REDUCT_IMAGE}
+    container_name: robot-orion
+    restart: unless-stopped
+    networks: [reductnet]
+    hostname: ${ORION_HOST}
+    environment:
+      RS_HOST: 0.0.0.0
+      RS_PORT: 8383
+      RS_PUBLIC_URL: "http://orion.field.demo/"
+      RS_CORS_ALLOW_ORIGIN: "*"
+      RS_DATA_PATH: /data
+      RS_LICENSE_PATH: /licenses/reduct.lic
+      RS_BUCKET_TEL_NAME: telemetry
+      RS_BUCKET_TEL_QUOTA_TYPE: FIFO
+      RS_BUCKET_TEL_QUOTA_SIZE: 100Gb
+      RS_REPLICATION_R1_NAME: orion-to-cloud
+      RS_REPLICATION_R1_SRC_BUCKET: telemetry
+      RS_REPLICATION_R1_DST_BUCKET: orion
+      RS_REPLICATION_R1_DST_HOST: "http://cloud:8383"
+      RS_REPLICATION_R1_DST_TOKEN: ${CLOUD_API_TOKEN}
+      RS_REPLICATION_R1_ENTRIES: camera,lidar,imu
+      RS_REPLICATION_R1_WHEN: >
+        {
+          "&event": { "$$eq": "accident" },
+          "#ctx_before": "10m",
+          "#ctx_after": "1m"
+        }
+    volumes:
+      - ${HOST_DATA_ORION}:/data
+      - ${HOST_LICENSE_PATH}:/licenses/reduct.lic:ro
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.orion.rule=Host(`orion.field.demo`)"
+      - "traefik.http.routers.orion.entrypoints=web"
+      - "traefik.http.services.orion.loadbalancer.server.port=8383"
+
+  robot-atlas:
+    image: ${REDUCT_IMAGE}
+    container_name: robot-atlas
+    restart: unless-stopped
+    networks: [reductnet]
+    hostname: ${ATLAS_HOST}
+    environment:
+      RS_HOST: 0.0.0.0
+      RS_PORT: 8383
+      RS_PUBLIC_URL: "http://atlas.field.demo/"
+      RS_CORS_ALLOW_ORIGIN: "*"
+      RS_DATA_PATH: /data
+      RS_LICENSE_PATH: /licenses/reduct.lic
+      RS_BUCKET_TEL_NAME: telemetry
+      RS_BUCKET_TEL_QUOTA_TYPE: FIFO
+      RS_BUCKET_TEL_QUOTA_SIZE: 100Gb
+      RS_REPLICATION_R1_NAME: atlas-to-cloud
+      RS_REPLICATION_R1_SRC_BUCKET: telemetry
+      RS_REPLICATION_R1_DST_BUCKET: atlas
+      RS_REPLICATION_R1_DST_HOST: "http://cloud:8383"
+      RS_REPLICATION_R1_DST_TOKEN: ${CLOUD_API_TOKEN}
+      RS_REPLICATION_R1_ENTRIES: camera,lidar,imu
+      RS_REPLICATION_R1_WHEN: >
+        {
+          "$$or": [
+            { "&event": { "$$eq": "accident" } },
+            { "&vision": { "$$eq": "person_fallen" } }
+          ],
+          "#ctx_before": "10m",
+          "#ctx_after": "1m"
+        }
+    volumes:
+      - ${HOST_DATA_ATLAS}:/data
+      - ${HOST_LICENSE_PATH}:/licenses/reduct.lic:ro
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.atlas.rule=Host(`atlas.field.demo`)"
+      - "traefik.http.routers.atlas.entrypoints=web"
+      - "traefik.http.services.atlas.loadbalancer.server.port=8383"
+
+  robot-nova:
+    image: ${REDUCT_IMAGE}
+    container_name: robot-nova
+    restart: unless-stopped
+    networks: [reductnet]
+    hostname: ${NOVA_HOST}
+    environment:
+      RS_HOST: 0.0.0.0
+      RS_PORT: 8383
+      RS_PUBLIC_URL: "http://nova.field.demo/"
+      RS_CORS_ALLOW_ORIGIN: "*"
+      RS_DATA_PATH: /data
+      RS_LICENSE_PATH: /licenses/reduct.lic
+      RS_BUCKET_TEL_NAME: telemetry
+      RS_BUCKET_TEL_QUOTA_TYPE: FIFO
+      RS_BUCKET_TEL_QUOTA_SIZE: 100Gb
+      RS_REPLICATION_R1_NAME: nova-to-cloud
+      RS_REPLICATION_R1_SRC_BUCKET: telemetry
+      RS_REPLICATION_R1_DST_BUCKET: nova
+      RS_REPLICATION_R1_DST_HOST: "http://cloud:8383"
+      RS_REPLICATION_R1_DST_TOKEN: ${CLOUD_API_TOKEN}
+      RS_REPLICATION_R1_ENTRIES: camera,lidar,imu
+      RS_REPLICATION_R1_WHEN: >
+        {
+          "$$or": [
+            { "&event": { "$$eq": "accident" } },
+            { "&lidar_alert": { "$$eq": "obstacle_collision" } }
+          ],
+          "#ctx_before": "10m",
+          "#ctx_after": "1m"
+        }
+    volumes:
+      - ${HOST_DATA_NOVA}:/data
+      - ${HOST_LICENSE_PATH}:/licenses/reduct.lic:ro
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.nova.rule=Host(`nova.field.demo`)"
+      - "traefik.http.routers.nova.entrypoints=web"
+      - "traefik.http.services.nova.loadbalancer.server.port=8383"
+
+  grafana:
+    image: ${GRAFANA_IMAGE}
+    container_name: grafana
+    restart: unless-stopped
+    networks: [reductnet]
+    depends_on: [cloud]
+    environment:
+      GF_PLUGINS_PREINSTALL: "reductstore-datasource@@https://github.com/reductstore/reduct-grafana/releases/download/${GRAFANA_REDUCT_TAG}/reductstore-datasource-${GRAFANA_REDUCT_VERSION}.zip"
+      GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS: "reductstore-datasource"
+      GF_SERVER_ROOT_URL: "http://grafana.reduct.demo"
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: "Admin"
+      GF_AUTH_DISABLE_LOGIN_FORM: "true"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.grafana.rule=Host(`grafana.reduct.demo`)"
+      - "traefik.http.routers.grafana.entrypoints=web"
+      - "traefik.http.services.grafana.loadbalancer.server.port=3000"
+
+  foxglove:
+    image: ${FOXGLOVE_IMAGE}
+    container_name: foxglove
+    restart: unless-stopped
+    networks: [reductnet]
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.foxglove.rule=Host(`foxglove.reduct.demo`)"
+      - "traefik.http.routers.foxglove.entrypoints=web"
+      - "traefik.http.services.foxglove.loadbalancer.server.port=8080"

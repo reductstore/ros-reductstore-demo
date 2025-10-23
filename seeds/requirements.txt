@@ -1,6 +1,7 @@
 jupyterlab
-reduct-py
+reduct-py==1.17.0
 mcap
 mcap-ros2-support
 pillow
 matplotlib
+tqdm

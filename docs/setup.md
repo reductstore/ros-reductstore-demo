@@ -156,6 +156,34 @@ Then watch the rolling update:
 juju status --watch 1s
 ```
 
+## Reinstall Juju cleanly
+
+### Stop any port-forwards or lingering juju processes
+```bash
+pkill -f juju 2>/dev/null || true
+```
+
+### Remove Juju snap and its data
+```bash
+sudo snap remove juju
+```
+
+### Delete all Juju client state and cached controllers
+```bash
+rm -rf ~/.local/share/juju
+```
+
+### Clean out any stale namespaces from MicroK8s
+```bash
+microk8s kubectl get ns | grep controller- | awk '{print $1}' | \
+  xargs -r -n1 microk8s kubectl delete ns --grace-period=0 --force
+```
+
+### Reinstall Juju fresh
+```bash
+sudo snap install juju --channel 3.6/stable
+```
+
 ## Use LXD to simulate robots
 
 [LXD](https://canonical.com/lxd) will be used to simulate multiple robots on a single machine.

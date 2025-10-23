@@ -196,32 +196,9 @@ sudo modprobe dummy
 sudo ip link add dummy0 type dummy
 sudo ip addr add 192.168.178.94/24 dev dummy0
 sudo ip link set dummy0 up
-sudo ip route replace default dev dummy0 metric 500
+# sudo ip route replace default dev dummy0 metric 500
+# sudo ip route del default dev dummy0
 ```
-
-### Persistent systemd service
-
-```ini
-# /etc/systemd/system/dummy-net.service
-[Unit]
-Description=Persistent dummy interface for airgapped K8s
-After=network-online.target
-Wants=network-online.target
-
-[Service]
-Type=oneshot
-ExecStart=/sbin/modprobe dummy
-ExecStart=/sbin/ip link add dummy0 type dummy
-ExecStart=/sbin/ip addr add 192.168.178.94/24 dev dummy0
-ExecStart=/sbin/ip link set dummy0 up
-ExecStart=/sbin/ip route replace default dev dummy0 metric 500
-RemainAfterExit=yes
-
-[Install]
-WantedBy=multi-user.target
-```
-
----
 
 ## Verifying Everything
 
@@ -234,9 +211,6 @@ microk8s status --wait-ready
 
 # Check kubelet and apiserver ports
 sudo ss -lntp | grep -E ':16443|:10250'
-
-# Check kubelet health
-curl -k https://demo.local:10250/healthz
 
 # Check workloads
 juju status
