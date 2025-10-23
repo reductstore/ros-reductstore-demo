@@ -273,12 +273,28 @@ async def write_json_batch(
 
 
 # ---------------------- Synthetic labels ----------------------
-EVENT_CHOICES = ["accident", "near_miss", "zone_breach"]
-VISION_CHOICES = ["person_fallen", "no_helmet", "blocked_path"]
-LIDAR_CHOICES = ["obstacle_collision", "close_range_alert", "stairs_detected"]
+# Numeric ranges for different metrics (designed for Grafana visualization)
+BATTERY_RANGE = (15, 100)  # Battery percentage: 15-100%
+CPU_TEMP_RANGE = (45, 85)  # CPU temperature: 45-85°C
+MEMORY_USAGE_RANGE = (20, 95)  # Memory usage: 20-95%
+NETWORK_LATENCY_RANGE = (1, 150)  # Network latency: 1-150ms
+VIBRATION_RANGE = (0, 25)  # Vibration level: 0-25 units
+SAFETY_SCORE_RANGE = (60, 100)  # Safety compliance: 60-100%
+OBSTACLE_DISTANCE_RANGE = (0, 500)  # Nearest obstacle: 0-500cm
+SPEED_RANGE = (0, 180)  # Current speed: 0-1.8 m/s (scaled to 0-180)
+CONFIDENCE_RANGE = (70, 99)  # AI confidence: 70-99%
+SIGNAL_STRENGTH_RANGE = (-90, -30)  # WiFi signal: -90 to -30 dBm
 
+# Site and shift mappings (keeping some categorical for context)
 SITES = ["alpha-plant", "beta-yard", "charlie-warehouse"]
 SHIFTS = ["day", "swing", "night"]
+
+# Zone types with numeric risk levels
+ZONE_RISK_MAPPING = {
+    "safe_zone": (0, 20),
+    "caution_zone": (20, 60),
+    "restricted_zone": (60, 100),
+}
 
 
 def session_context(robot_name: str) -> Dict[str, str]:
@@ -294,12 +310,54 @@ def session_context(robot_name: str) -> Dict[str, str]:
 
 
 def sprinkle_incidents(labels: Dict[str, str]) -> Dict[str, str]:
+    """Add synthetic numeric metrics for rich Grafana visualization."""
+
+    # Core performance metrics (always present)
+    labels["battery_pct"] = str(random.randint(*BATTERY_RANGE))
+    labels["cpu_temp_c"] = str(random.randint(*CPU_TEMP_RANGE))
+    labels["memory_pct"] = str(random.randint(*MEMORY_USAGE_RANGE))
+    labels["net_latency_ms"] = str(random.randint(*NETWORK_LATENCY_RANGE))
+
+    # Environmental & safety metrics (conditional)
+    if random.random() < 0.7:  # 70% chance
+        labels["vibration_level"] = str(random.randint(*VIBRATION_RANGE))
+
+    if random.random() < 0.8:  # 80% chance
+        labels["safety_score"] = str(random.randint(*SAFETY_SCORE_RANGE))
+
+    # Navigation & perception metrics
+    if random.random() < 0.6:  # 60% chance
+        labels["obstacle_dist_cm"] = str(random.randint(*OBSTACLE_DISTANCE_RANGE))
+
+    if random.random() < 0.9:  # 90% chance
+        labels["speed_scaled"] = str(random.randint(*SPEED_RANGE))
+
+    if random.random() < 0.75:  # 75% chance
+        labels["ai_confidence"] = str(random.randint(*CONFIDENCE_RANGE))
+
+    # Communication metrics
+    if random.random() < 0.85:  # 85% chance
+        labels["wifi_dbm"] = str(random.randint(*SIGNAL_STRENGTH_RANGE))
+
+    # Zone-based risk assessment
+    if random.random() < 0.4:  # 40% chance
+        zone_type = random.choice(list(ZONE_RISK_MAPPING.keys()))
+        risk_range = ZONE_RISK_MAPPING[zone_type]
+        labels["zone_risk"] = str(random.randint(*risk_range))
+        labels["zone_type"] = zone_type
+
+    # Event severity levels (numeric instead of categorical)
     if random.random() < CFG.P_EVENT:
-        labels["event"] = random.choice(EVENT_CHOICES)
+        labels["event_severity"] = str(random.randint(1, 10))  # 1=minor, 10=critical
+
     if random.random() < CFG.P_VISION:
-        labels["vision"] = random.choice(VISION_CHOICES)
+        labels["vision_confidence"] = str(
+            random.randint(50, 95)
+        )  # Vision detection confidence
+
     if random.random() < CFG.P_LIDAR_ALERT:
-        labels["lidar_alert"] = random.choice(LIDAR_CHOICES)
+        labels["lidar_quality"] = str(random.randint(70, 100))  # LiDAR data quality
+
     return labels
 
 
