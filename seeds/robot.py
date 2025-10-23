@@ -38,16 +38,16 @@ class Config:
     MCAP_INPUT_PATH: str = "./data/example-010-amr.mcap"
 
     # Target robot endpoint & bucket
-    REDUCT_URL: str = "http://orion.field.demo"  # e.g. http://orion.field.demo
+    BUCKET: str = "atlas"  # bucket equals robot name
+    REDUCT_URL: str = f"http://{BUCKET}.field.demo"
     API_TOKEN: str = "reductstore"
-    BUCKET: str = "orion"  # bucket equals robot name
 
     # Session plan: 10-min sessions, spaced out, covering past→future window
     CLIP_SECONDS: float = 30.0
     SESSION_DURATION_SECONDS: int = 10 * 60
     SESSION_INTERVAL_SECONDS: int = 18 * 60 * 60  # start a session every 18 hours
-    START_OFFSET: timedelta = timedelta(days=-1)  # ~1 month ago
-    END_OFFSET: timedelta = timedelta(days=+0)  # ~0.5 month ahead
+    START_OFFSET: timedelta = timedelta(days=-1)
+    END_OFFSET: timedelta = timedelta(days=+0)
 
     # Save rules
     SAVE_IMAGES: bool = True  # keep JPEG/PNG only, rotated -90°

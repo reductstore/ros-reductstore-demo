@@ -9,6 +9,10 @@ volumes:
   grafana-data:
 
 services:
+
+  # =========================
+  # Traefik
+  # =========================
   traefik:
     image: traefik:v3.1
     container_name: traefik
@@ -38,8 +42,11 @@ services:
       - "traefik.http.routers.dashboard.entrypoints=web"
       - "traefik.http.routers.dashboard.service=api@internal"
 
+  # =========================
+  # Cloud
+  # =========================
   cloud:
-    image: ${REDUCT_IMAGE}
+    image: ${REDUCT_IMAGE:-reduct/store:latest}
     container_name: cloud
     restart: unless-stopped
     networks: [reductnet]
@@ -74,12 +81,15 @@ services:
       - "traefik.http.routers.cloud.entrypoints=web"
       - "traefik.http.services.cloud.loadbalancer.server.port=8383"
 
+  # =========================
+  # Robot: ORION
+  # =========================
   robot-orion:
-    image: ${REDUCT_IMAGE}
+    image: ${REDUCT_IMAGE:-reduct/store:latest}
     container_name: robot-orion
     restart: unless-stopped
     networks: [reductnet]
-    hostname: ${ORION_HOST}
+    hostname: ${ORION_HOST:-orion}
     environment:
       RS_HOST: 0.0.0.0
       RS_PORT: 8383
@@ -87,20 +97,70 @@ services:
       RS_CORS_ALLOW_ORIGIN: "*"
       RS_DATA_PATH: /data
       RS_LICENSE_PATH: /licenses/reduct.lic
-      RS_BUCKET_TEL_NAME: telemetry
+      RS_BUCKET_TEL_NAME: orion
       RS_BUCKET_TEL_QUOTA_TYPE: FIFO
-      RS_BUCKET_TEL_QUOTA_SIZE: 100Gb
-      RS_REPLICATION_R1_NAME: orion-to-cloud
-      RS_REPLICATION_R1_SRC_BUCKET: telemetry
+      RS_BUCKET_TEL_QUOTA_SIZE: 20Gb
+
+      # --- R1: Downsample images to 1 fps (always-on gate via $each_t) ---
+      RS_REPLICATION_R1_NAME: orion-image-1fps
+      RS_REPLICATION_R1_SRC_BUCKET: orion
       RS_REPLICATION_R1_DST_BUCKET: orion
       RS_REPLICATION_R1_DST_HOST: "http://cloud:8383"
       RS_REPLICATION_R1_DST_TOKEN: ${CLOUD_API_TOKEN}
-      RS_REPLICATION_R1_ENTRIES: camera,lidar,imu
+      RS_REPLICATION_R1_ENTRIES: image
       RS_REPLICATION_R1_WHEN: >
         {
-          "&event": { "$$eq": "accident" },
-          "#ctx_before": "10m",
-          "#ctx_after": "1m"
+          "$$each_t": "1s"
+        }
+
+
+      # --- R2: Medium severity (whole bucket, no context) ---
+      RS_REPLICATION_R2_NAME: orion-medium
+      RS_REPLICATION_R2_SRC_BUCKET: orion
+      RS_REPLICATION_R2_DST_BUCKET: orion
+      RS_REPLICATION_R2_DST_HOST: "http://cloud:8383"
+      RS_REPLICATION_R2_DST_TOKEN: ${CLOUD_API_TOKEN}
+      RS_REPLICATION_R2_WHEN: >
+        {
+          "$$or": [
+            { "$$and": [ { "$$gte": ["&event_severity", 4] }, { "$$lte": ["&event_severity", 7] } ] },
+            { "$$and": [ { "$$gte": ["&zone_risk", 20] },      { "$$lt":  ["&zone_risk", 60] } ] },
+            { "&obstacle_dist_cm":  { "$$lte": 100 } },
+            { "&battery_pct":       { "$$lte": 30 } },
+            { "&cpu_temp_c":        { "$$gte": 75 } },
+            { "&memory_pct":        { "$$gte": 85 } },
+            { "&net_latency_ms":    { "$$gte": 100 } },
+            { "&wifi_dbm":          { "$$lte": -75 } },
+            { "&vibration_level":   { "$$gte": 15 } },
+            { "&speed_scaled":      { "$$gte": 140 } },
+            { "&ai_confidence":     { "$$lte": 80 } },
+            { "&vision_confidence": { "$$lte": 65 } }
+          ]
+        }
+
+      # --- R3: High severity (whole bucket, 5 min of pre-context) ---
+      RS_REPLICATION_R3_NAME: orion-high
+      RS_REPLICATION_R3_SRC_BUCKET: orion
+      RS_REPLICATION_R3_DST_BUCKET: orion
+      RS_REPLICATION_R3_DST_HOST: "http://cloud:8383"
+      RS_REPLICATION_R3_DST_TOKEN: ${CLOUD_API_TOKEN}
+      RS_REPLICATION_R3_WHEN: >
+        {
+          "$$or": [
+            { "&event_severity":    { "$$gte": 8 } },
+            { "&zone_risk":         { "$$gte": 60 } },
+            { "&obstacle_dist_cm":  { "$$lte": 30 } },
+            { "&battery_pct":       { "$$lte": 18 } },
+            { "&cpu_temp_c":        { "$$gte": 82 } },
+            { "&memory_pct":        { "$$gte": 92 } },
+            { "&net_latency_ms":    { "$$gte": 130 } },
+            { "&wifi_dbm":          { "$$lte": -85 } },
+            { "&vibration_level":   { "$$gte": 22 } },
+            { "&speed_scaled":      { "$$gte": 170 } },
+            { "&ai_confidence":     { "$$lte": 72 } },
+            { "&vision_confidence": { "$$lte": 55 } }
+          ],
+          "#ctx_before": "5m"
         }
     volumes:
       - ${HOST_DATA_ORION}:/data
@@ -111,12 +171,16 @@ services:
       - "traefik.http.routers.orion.entrypoints=web"
       - "traefik.http.services.orion.loadbalancer.server.port=8383"
 
+  # =========================
+  # Robot: ATLAS
+  # =========================
+
   robot-atlas:
-    image: ${REDUCT_IMAGE}
+    image: ${REDUCT_IMAGE:-reduct/store:latest}
     container_name: robot-atlas
     restart: unless-stopped
     networks: [reductnet]
-    hostname: ${ATLAS_HOST}
+    hostname: ${ATLAS_HOST:-atlas}
     environment:
       RS_HOST: 0.0.0.0
       RS_PORT: 8383
@@ -124,23 +188,67 @@ services:
       RS_CORS_ALLOW_ORIGIN: "*"
       RS_DATA_PATH: /data
       RS_LICENSE_PATH: /licenses/reduct.lic
-      RS_BUCKET_TEL_NAME: telemetry
+      RS_BUCKET_TEL_NAME: atlas
       RS_BUCKET_TEL_QUOTA_TYPE: FIFO
-      RS_BUCKET_TEL_QUOTA_SIZE: 100Gb
-      RS_REPLICATION_R1_NAME: atlas-to-cloud
-      RS_REPLICATION_R1_SRC_BUCKET: telemetry
+      RS_BUCKET_TEL_QUOTA_SIZE: 20Gb
+
+      RS_REPLICATION_R1_NAME: atlas-image-1fps
+      RS_REPLICATION_R1_SRC_BUCKET: atlas
       RS_REPLICATION_R1_DST_BUCKET: atlas
       RS_REPLICATION_R1_DST_HOST: "http://cloud:8383"
       RS_REPLICATION_R1_DST_TOKEN: ${CLOUD_API_TOKEN}
-      RS_REPLICATION_R1_ENTRIES: camera,lidar,imu
+      RS_REPLICATION_R1_ENTRIES: image
       RS_REPLICATION_R1_WHEN: >
         {
+          "$$each_t": "1s"
+        }
+
+      RS_REPLICATION_R2_NAME: atlas-medium
+      RS_REPLICATION_R2_SRC_BUCKET: atlas
+      RS_REPLICATION_R2_DST_BUCKET: atlas
+      RS_REPLICATION_R2_DST_HOST: "http://cloud:8383"
+      RS_REPLICATION_R2_DST_TOKEN: ${CLOUD_API_TOKEN}
+      RS_REPLICATION_R2_WHEN: >
+        {
           "$$or": [
-            { "&event": { "$$eq": "accident" } },
-            { "&vision": { "$$eq": "person_fallen" } }
+            { "$$and": [ { "$$gte": ["&event_severity", 4] }, { "$$lte": ["&event_severity", 7] } ] },
+            { "$$and": [ { "$$gte": ["&zone_risk", 20] },      { "$$lt":  ["&zone_risk", 60] } ] },
+            { "&obstacle_dist_cm":  { "$$lte": 100 } },
+            { "&battery_pct":       { "$$lte": 30 } },
+            { "&cpu_temp_c":        { "$$gte": 75 } },
+            { "&memory_pct":        { "$$gte": 85 } },
+            { "&net_latency_ms":    { "$$gte": 100 } },
+            { "&wifi_dbm":          { "$$lte": -75 } },
+            { "&vibration_level":   { "$$gte": 15 } },
+            { "&speed_scaled":      { "$$gte": 140 } },
+            { "&ai_confidence":     { "$$lte": 80 } },
+            { "&vision_confidence": { "$$lte": 65 } }
+          ]
+        }
+
+
+      RS_REPLICATION_R3_NAME: atlas-high
+      RS_REPLICATION_R3_SRC_BUCKET: atlas
+      RS_REPLICATION_R3_DST_BUCKET: atlas
+      RS_REPLICATION_R3_DST_HOST: "http://cloud:8383"
+      RS_REPLICATION_R3_DST_TOKEN: ${CLOUD_API_TOKEN}
+      RS_REPLICATION_R3_WHEN: >
+        {
+          "$$or": [
+            { "&event_severity":    { "$$gte": 8 } },
+            { "&zone_risk":         { "$$gte": 60 } },
+            { "&obstacle_dist_cm":  { "$$lte": 30 } },
+            { "&battery_pct":       { "$$lte": 18 } },
+            { "&cpu_temp_c":        { "$$gte": 82 } },
+            { "&memory_pct":        { "$$gte": 92 } },
+            { "&net_latency_ms":    { "$$gte": 130 } },
+            { "&wifi_dbm":          { "$$lte": -85 } },
+            { "&vibration_level":   { "$$gte": 22 } },
+            { "&speed_scaled":      { "$$gte": 170 } },
+            { "&ai_confidence":     { "$$lte": 72 } },
+            { "&vision_confidence": { "$$lte": 55 } }
           ],
-          "#ctx_before": "10m",
-          "#ctx_after": "1m"
+          "#ctx_before": "5m"
         }
     volumes:
       - ${HOST_DATA_ATLAS}:/data
@@ -152,7 +260,7 @@ services:
       - "traefik.http.services.atlas.loadbalancer.server.port=8383"
 
   robot-nova:
-    image: ${REDUCT_IMAGE}
+    image: ${REDUCT_IMAGE:-reduct/store:latest}
     container_name: robot-nova
     restart: unless-stopped
     networks: [reductnet]
@@ -164,23 +272,66 @@ services:
       RS_CORS_ALLOW_ORIGIN: "*"
       RS_DATA_PATH: /data
       RS_LICENSE_PATH: /licenses/reduct.lic
-      RS_BUCKET_TEL_NAME: telemetry
+      RS_BUCKET_TEL_NAME: nova
       RS_BUCKET_TEL_QUOTA_TYPE: FIFO
-      RS_BUCKET_TEL_QUOTA_SIZE: 100Gb
-      RS_REPLICATION_R1_NAME: nova-to-cloud
-      RS_REPLICATION_R1_SRC_BUCKET: telemetry
+      RS_BUCKET_TEL_QUOTA_SIZE: 20Gb
+
+      RS_REPLICATION_R1_NAME: nova-image-1fps
+      RS_REPLICATION_R1_SRC_BUCKET: nova
       RS_REPLICATION_R1_DST_BUCKET: nova
       RS_REPLICATION_R1_DST_HOST: "http://cloud:8383"
       RS_REPLICATION_R1_DST_TOKEN: ${CLOUD_API_TOKEN}
-      RS_REPLICATION_R1_ENTRIES: camera,lidar,imu
+      RS_REPLICATION_R1_ENTRIES: image
       RS_REPLICATION_R1_WHEN: >
         {
+          "$$each_t": "1s"
+        }
+
+      RS_REPLICATION_R2_NAME: nova-medium
+      RS_REPLICATION_R2_SRC_BUCKET: nova
+      RS_REPLICATION_R2_DST_BUCKET: nova
+      RS_REPLICATION_R2_DST_HOST: "http://cloud:8383"
+      RS_REPLICATION_R2_DST_TOKEN: ${CLOUD_API_TOKEN}
+      RS_REPLICATION_R2_WHEN: >
+        {
           "$$or": [
-            { "&event": { "$$eq": "accident" } },
-            { "&lidar_alert": { "$$eq": "obstacle_collision" } }
+            { "$$and": [ { "$$gte": ["&event_severity", 4] }, { "$$lte": ["&event_severity", 7] } ] },
+            { "$$and": [ { "$$gte": ["&zone_risk", 20] },      { "$$lt":  ["&zone_risk", 60] } ] },
+            { "&obstacle_dist_cm":  { "$$lte": 100 } },
+            { "&battery_pct":       { "$$lte": 30 } },
+            { "&cpu_temp_c":        { "$$gte": 75 } },
+            { "&memory_pct":        { "$$gte": 85 } },
+            { "&net_latency_ms":    { "$$gte": 100 } },
+            { "&wifi_dbm":          { "$$lte": -75 } },
+            { "&vibration_level":   { "$$gte": 15 } },
+            { "&speed_scaled":      { "$$gte": 140 } },
+            { "&ai_confidence":     { "$$lte": 80 } },
+            { "&vision_confidence": { "$$lte": 65 } }
+          ]
+        }
+
+      RS_REPLICATION_R3_NAME: nova-high
+      RS_REPLICATION_R3_SRC_BUCKET: nova
+      RS_REPLICATION_R3_DST_BUCKET: nova
+      RS_REPLICATION_R3_DST_HOST: "http://cloud:8383"
+      RS_REPLICATION_R3_DST_TOKEN: ${CLOUD_API_TOKEN}
+      RS_REPLICATION_R3_WHEN: >
+        {
+          "$$or": [
+            { "&event_severity":    { "$$gte": 8 } },
+            { "&zone_risk":         { "$$gte": 60 } },
+            { "&obstacle_dist_cm":  { "$$lte": 30 } },
+            { "&battery_pct":       { "$$lte": 18 } },
+            { "&cpu_temp_c":        { "$$gte": 82 } },
+            { "&memory_pct":        { "$$gte": 92 } },
+            { "&net_latency_ms":    { "$$gte": 130 } },
+            { "&wifi_dbm":          { "$$lte": -85 } },
+            { "&vibration_level":   { "$$gte": 22 } },
+            { "&speed_scaled":      { "$$gte": 170 } },
+            { "&ai_confidence":     { "$$lte": 72 } },
+            { "&vision_confidence": { "$$lte": 55 } }
           ],
-          "#ctx_before": "10m",
-          "#ctx_after": "1m"
+          "#ctx_before": "5m"
         }
     volumes:
       - ${HOST_DATA_NOVA}:/data
@@ -213,6 +364,9 @@ services:
       - "traefik.http.routers.grafana.entrypoints=web"
       - "traefik.http.services.grafana.loadbalancer.server.port=3000"
 
+  # =========================
+  # Foxglove (Ubuntu ROCK image)
+  # =========================
   foxglove:
     image: ${FOXGLOVE_IMAGE}
     container_name: foxglove
