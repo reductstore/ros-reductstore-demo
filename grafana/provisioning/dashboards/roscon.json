@@ -18,9 +18,310 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 1,
+  "id": 9,
   "links": [],
   "panels": [
+    {
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 2,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 20,
+      "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "# ROSCon225",
+        "mode": "markdown"
+      },
+      "pluginVersion": "11.6.1",
+      "title": "",
+      "transparent": true,
+      "type": "text"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 2
+      },
+      "id": 21,
+      "panels": [],
+      "title": "Robot: atlas",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "reductstore-datasource",
+        "uid": "af1y9w5ass8w0f"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "thresholds": {
+            "mode": "percentage",
+            "steps": [
+              {
+                "color": "red"
+              },
+              {
+                "color": "yellow",
+                "value": 50
+              },
+              {
+                "color": "green",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "ai_confidence"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "AI Confidence"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 3
+      },
+      "id": 1,
+      "options": {
+        "minVizHeight": 75,
+        "minVizWidth": 75,
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "sizing": "auto"
+      },
+      "pluginVersion": "11.6.1",
+      "targets": [
+        {
+          "bucket": "atlas",
+          "datasource": {
+            "type": "reductstore-datasource",
+            "uid": "af1y9w5ass8w0f"
+          },
+          "entry": "imu",
+          "options": {
+            "mode": "labels",
+            "when": {
+              "#select_labels": [
+                "ai_confidence"
+              ],
+              "$each_t": "1s"
+            }
+          },
+          "refId": "A"
+        }
+      ],
+      "title": "AI Confidence",
+      "type": "gauge"
+    },
+    {
+      "datasource": {
+        "type": "reductstore-datasource",
+        "uid": "af1y9w5ass8w0f"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "thresholds": {
+            "mode": "percentage",
+            "steps": [
+              {
+                "color": "red"
+              },
+              {
+                "color": "yellow",
+                "value": 50
+              },
+              {
+                "color": "green",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "ai_confidence"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "AI Confidence"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 3
+      },
+      "id": 2,
+      "options": {
+        "minVizHeight": 75,
+        "minVizWidth": 75,
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "sizing": "auto"
+      },
+      "pluginVersion": "11.6.1",
+      "targets": [
+        {
+          "bucket": "atlas",
+          "datasource": {
+            "type": "reductstore-datasource",
+            "uid": "af1y9w5ass8w0f"
+          },
+          "entry": "imu",
+          "options": {
+            "mode": "labels",
+            "when": {
+              "#select_labels": [
+                "battery_pct"
+              ],
+              "$each_t": "1s"
+            }
+          },
+          "refId": "A"
+        }
+      ],
+      "title": "Battery",
+      "type": "gauge"
+    },
+    {
+      "datasource": {
+        "type": "reductstore-datasource",
+        "uid": "af1y9w5ass8w0f"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red"
+              },
+              {
+                "color": "yellow",
+                "value": 60
+              },
+              {
+                "color": "green",
+                "value": 85
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "ai_confidence"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "AI Confidence"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 3
+      },
+      "id": 3,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.6.1",
+      "targets": [
+        {
+          "bucket": "atlas",
+          "datasource": {
+            "type": "reductstore-datasource",
+            "uid": "af1y9w5ass8w0f"
+          },
+          "entry": "imu",
+          "options": {
+            "mode": "labels",
+            "when": {
+              "#select_labels": [
+                "safety_score"
+              ],
+              "$each_t": "1s"
+            }
+          },
+          "refId": "A"
+        }
+      ],
+      "title": "Safety Score",
+      "type": "stat"
+    },
     {
       "datasource": {
         "type": "reductstore-datasource",
@@ -49,8 +350,8 @@
             },
             "insertNulls": false,
             "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
+            "lineWidth": 2,
+            "pointSize": 4,
             "scaleDistribution": {
               "type": "linear"
             },
@@ -78,15 +379,28 @@
             ]
           }
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "ai_confidence"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "AI Confidence"
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 10,
-        "w": 24,
+        "w": 12,
         "x": 0,
-        "y": 0
+        "y": 11
       },
-      "id": 1,
+      "id": 4,
       "options": {
         "legend": {
           "calcs": [],
@@ -108,21 +422,1643 @@
             "type": "reductstore-datasource",
             "uid": "af1y9w5ass8w0f"
           },
-          "entry": "temperature",
+          "entry": "imu",
           "options": {
             "mode": "labels",
-            "when": {}
+            "when": {
+              "#select_labels": [
+                "lidar_quality",
+                "vision_confidence",
+                "ai_confidence"
+              ],
+              "$each_t": "1s"
+            }
           },
           "refId": "A"
         }
       ],
-      "title": "Panel Title",
+      "title": "Perception — LiDAR & Vision",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "reductstore-datasource",
+        "uid": "af1y9w5ass8w0f"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 4,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "ai_confidence"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "AI Confidence"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 12,
+        "y": 11
+      },
+      "id": 5,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.6.1",
+      "targets": [
+        {
+          "bucket": "atlas",
+          "datasource": {
+            "type": "reductstore-datasource",
+            "uid": "af1y9w5ass8w0f"
+          },
+          "entry": "imu",
+          "options": {
+            "mode": "labels",
+            "when": {
+              "#select_labels": [
+                "speed_scaled",
+                "vibration_level",
+                "obstacle_dist_cm"
+              ],
+              "$each_t": "1s"
+            }
+          },
+          "refId": "A"
+        }
+      ],
+      "title": "Mobility — Speed & Vibration",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "reductstore-datasource",
+        "uid": "af1y9w5ass8w0f"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 4,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "ai_confidence"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "AI Confidence"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 0,
+        "y": 21
+      },
+      "id": 6,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.6.1",
+      "targets": [
+        {
+          "bucket": "atlas",
+          "datasource": {
+            "type": "reductstore-datasource",
+            "uid": "af1y9w5ass8w0f"
+          },
+          "entry": "imu",
+          "options": {
+            "mode": "labels",
+            "when": {
+              "#select_labels": [
+                "wifi_dbm",
+                "net_latency_ms"
+              ],
+              "$each_t": "1s"
+            }
+          },
+          "refId": "A"
+        }
+      ],
+      "title": "Comms — WiFi & Latency",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "reductstore-datasource",
+        "uid": "af1y9w5ass8w0f"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 4,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "ai_confidence"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "AI Confidence"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 12,
+        "y": 21
+      },
+      "id": 7,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.6.1",
+      "targets": [
+        {
+          "bucket": "atlas",
+          "datasource": {
+            "type": "reductstore-datasource",
+            "uid": "af1y9w5ass8w0f"
+          },
+          "entry": "imu",
+          "options": {
+            "mode": "labels",
+            "when": {
+              "#select_labels": [
+                "battery_pct",
+                "cpu_temp_c",
+                "memory_pct"
+              ],
+              "$each_t": "1s"
+            }
+          },
+          "refId": "A"
+        }
+      ],
+      "title": "Power — Battery & CPU",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 31
+      },
+      "id": 22,
+      "panels": [],
+      "title": "Robot: nova",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "reductstore-datasource",
+        "uid": "af1y9w5ass8w0f"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "thresholds": {
+            "mode": "percentage",
+            "steps": [
+              {
+                "color": "red"
+              },
+              {
+                "color": "yellow",
+                "value": 50
+              },
+              {
+                "color": "green",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "ai_confidence"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "AI Confidence"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 32
+      },
+      "id": 8,
+      "options": {
+        "minVizHeight": 75,
+        "minVizWidth": 75,
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "sizing": "auto"
+      },
+      "pluginVersion": "11.6.1",
+      "targets": [
+        {
+          "bucket": "nova",
+          "datasource": {
+            "type": "reductstore-datasource",
+            "uid": "af1y9w5ass8w0f"
+          },
+          "entry": "imu",
+          "options": {
+            "mode": "labels",
+            "when": {
+              "#select_labels": [
+                "ai_confidence"
+              ],
+              "$each_t": "1s"
+            }
+          },
+          "refId": "A"
+        }
+      ],
+      "title": "AI Confidence",
+      "type": "gauge"
+    },
+    {
+      "datasource": {
+        "type": "reductstore-datasource",
+        "uid": "af1y9w5ass8w0f"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "thresholds": {
+            "mode": "percentage",
+            "steps": [
+              {
+                "color": "red"
+              },
+              {
+                "color": "yellow",
+                "value": 50
+              },
+              {
+                "color": "green",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "ai_confidence"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "AI Confidence"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 32
+      },
+      "id": 9,
+      "options": {
+        "minVizHeight": 75,
+        "minVizWidth": 75,
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "sizing": "auto"
+      },
+      "pluginVersion": "11.6.1",
+      "targets": [
+        {
+          "bucket": "nova",
+          "datasource": {
+            "type": "reductstore-datasource",
+            "uid": "af1y9w5ass8w0f"
+          },
+          "entry": "imu",
+          "options": {
+            "mode": "labels",
+            "when": {
+              "#select_labels": [
+                "battery_pct"
+              ],
+              "$each_t": "1s"
+            }
+          },
+          "refId": "A"
+        }
+      ],
+      "title": "Battery",
+      "type": "gauge"
+    },
+    {
+      "datasource": {
+        "type": "reductstore-datasource",
+        "uid": "af1y9w5ass8w0f"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red"
+              },
+              {
+                "color": "yellow",
+                "value": 60
+              },
+              {
+                "color": "green",
+                "value": 85
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "ai_confidence"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "AI Confidence"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 32
+      },
+      "id": 10,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.6.1",
+      "targets": [
+        {
+          "bucket": "nova",
+          "datasource": {
+            "type": "reductstore-datasource",
+            "uid": "af1y9w5ass8w0f"
+          },
+          "entry": "imu",
+          "options": {
+            "mode": "labels",
+            "when": {
+              "#select_labels": [
+                "safety_score"
+              ],
+              "$each_t": "1s"
+            }
+          },
+          "refId": "A"
+        }
+      ],
+      "title": "Safety Score",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "reductstore-datasource",
+        "uid": "af1y9w5ass8w0f"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 4,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "ai_confidence"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "AI Confidence"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 0,
+        "y": 40
+      },
+      "id": 11,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.6.1",
+      "targets": [
+        {
+          "bucket": "nova",
+          "datasource": {
+            "type": "reductstore-datasource",
+            "uid": "af1y9w5ass8w0f"
+          },
+          "entry": "imu",
+          "options": {
+            "mode": "labels",
+            "when": {
+              "#select_labels": [
+                "lidar_quality",
+                "vision_confidence",
+                "ai_confidence"
+              ],
+              "$each_t": "1s"
+            }
+          },
+          "refId": "A"
+        }
+      ],
+      "title": "Perception — LiDAR & Vision",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "reductstore-datasource",
+        "uid": "af1y9w5ass8w0f"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 4,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "ai_confidence"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "AI Confidence"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 12,
+        "y": 40
+      },
+      "id": 12,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.6.1",
+      "targets": [
+        {
+          "bucket": "nova",
+          "datasource": {
+            "type": "reductstore-datasource",
+            "uid": "af1y9w5ass8w0f"
+          },
+          "entry": "imu",
+          "options": {
+            "mode": "labels",
+            "when": {
+              "#select_labels": [
+                "speed_scaled",
+                "vibration_level",
+                "obstacle_dist_cm"
+              ],
+              "$each_t": "1s"
+            }
+          },
+          "refId": "A"
+        }
+      ],
+      "title": "Mobility — Speed & Vibration",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 50
+      },
+      "id": 23,
+      "panels": [],
+      "title": "Robot: orion",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "reductstore-datasource",
+        "uid": "af1y9w5ass8w0f"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "thresholds": {
+            "mode": "percentage",
+            "steps": [
+              {
+                "color": "red"
+              },
+              {
+                "color": "yellow",
+                "value": 50
+              },
+              {
+                "color": "green",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "ai_confidence"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "AI Confidence"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 51
+      },
+      "id": 13,
+      "options": {
+        "minVizHeight": 75,
+        "minVizWidth": 75,
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "sizing": "auto"
+      },
+      "pluginVersion": "11.6.1",
+      "targets": [
+        {
+          "bucket": "orion",
+          "datasource": {
+            "type": "reductstore-datasource",
+            "uid": "af1y9w5ass8w0f"
+          },
+          "entry": "imu",
+          "options": {
+            "mode": "labels",
+            "when": {
+              "#select_labels": [
+                "ai_confidence"
+              ],
+              "$each_t": "1s"
+            }
+          },
+          "refId": "A"
+        }
+      ],
+      "title": "AI Confidence",
+      "type": "gauge"
+    },
+    {
+      "datasource": {
+        "type": "reductstore-datasource",
+        "uid": "af1y9w5ass8w0f"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "thresholds": {
+            "mode": "percentage",
+            "steps": [
+              {
+                "color": "red"
+              },
+              {
+                "color": "yellow",
+                "value": 50
+              },
+              {
+                "color": "green",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "ai_confidence"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "AI Confidence"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 51
+      },
+      "id": 14,
+      "options": {
+        "minVizHeight": 75,
+        "minVizWidth": 75,
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "sizing": "auto"
+      },
+      "pluginVersion": "11.6.1",
+      "targets": [
+        {
+          "bucket": "orion",
+          "datasource": {
+            "type": "reductstore-datasource",
+            "uid": "af1y9w5ass8w0f"
+          },
+          "entry": "imu",
+          "options": {
+            "mode": "labels",
+            "when": {
+              "#select_labels": [
+                "battery_pct"
+              ],
+              "$each_t": "1s"
+            }
+          },
+          "refId": "A"
+        }
+      ],
+      "title": "Battery",
+      "type": "gauge"
+    },
+    {
+      "datasource": {
+        "type": "reductstore-datasource",
+        "uid": "af1y9w5ass8w0f"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red"
+              },
+              {
+                "color": "yellow",
+                "value": 60
+              },
+              {
+                "color": "green",
+                "value": 85
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "ai_confidence"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "AI Confidence"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 51
+      },
+      "id": 15,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.6.1",
+      "targets": [
+        {
+          "bucket": "orion",
+          "datasource": {
+            "type": "reductstore-datasource",
+            "uid": "af1y9w5ass8w0f"
+          },
+          "entry": "imu",
+          "options": {
+            "mode": "labels",
+            "when": {
+              "#select_labels": [
+                "safety_score"
+              ],
+              "$each_t": "1s"
+            }
+          },
+          "refId": "A"
+        }
+      ],
+      "title": "Safety Score",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "reductstore-datasource",
+        "uid": "af1y9w5ass8w0f"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 4,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "ai_confidence"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "AI Confidence"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 0,
+        "y": 59
+      },
+      "id": 16,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.6.1",
+      "targets": [
+        {
+          "bucket": "orion",
+          "datasource": {
+            "type": "reductstore-datasource",
+            "uid": "af1y9w5ass8w0f"
+          },
+          "entry": "imu",
+          "options": {
+            "mode": "labels",
+            "when": {
+              "#select_labels": [
+                "lidar_quality",
+                "vision_confidence",
+                "ai_confidence"
+              ],
+              "$each_t": "1s"
+            }
+          },
+          "refId": "A"
+        }
+      ],
+      "title": "Perception — LiDAR & Vision",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "reductstore-datasource",
+        "uid": "af1y9w5ass8w0f"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 4,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "ai_confidence"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "AI Confidence"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 12,
+        "y": 59
+      },
+      "id": 17,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.6.1",
+      "targets": [
+        {
+          "bucket": "orion",
+          "datasource": {
+            "type": "reductstore-datasource",
+            "uid": "af1y9w5ass8w0f"
+          },
+          "entry": "imu",
+          "options": {
+            "mode": "labels",
+            "when": {
+              "#select_labels": [
+                "speed_scaled",
+                "vibration_level",
+                "obstacle_dist_cm"
+              ],
+              "$each_t": "1s"
+            }
+          },
+          "refId": "A"
+        }
+      ],
+      "title": "Mobility — Speed & Vibration",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "reductstore-datasource",
+        "uid": "af1y9w5ass8w0f"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 4,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "ai_confidence"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "AI Confidence"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 0,
+        "y": 69
+      },
+      "id": 18,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.6.1",
+      "targets": [
+        {
+          "bucket": "orion",
+          "datasource": {
+            "type": "reductstore-datasource",
+            "uid": "af1y9w5ass8w0f"
+          },
+          "entry": "imu",
+          "options": {
+            "mode": "labels",
+            "when": {
+              "#select_labels": [
+                "wifi_dbm",
+                "net_latency_ms"
+              ],
+              "$each_t": "1s"
+            }
+          },
+          "refId": "A"
+        }
+      ],
+      "title": "Comms — WiFi & Latency",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "reductstore-datasource",
+        "uid": "af1y9w5ass8w0f"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 4,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "ai_confidence"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "AI Confidence"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 12,
+        "y": 69
+      },
+      "id": 19,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.6.1",
+      "targets": [
+        {
+          "bucket": "orion",
+          "datasource": {
+            "type": "reductstore-datasource",
+            "uid": "af1y9w5ass8w0f"
+          },
+          "entry": "imu",
+          "options": {
+            "mode": "labels",
+            "when": {
+              "#select_labels": [
+                "battery_pct",
+                "cpu_temp_c",
+                "memory_pct"
+              ],
+              "$each_t": "1s"
+            }
+          },
+          "refId": "A"
+        }
+      ],
+      "title": "Power — Battery & CPU",
       "type": "timeseries"
     }
   ],
   "preload": false,
   "schemaVersion": 41,
-  "tags": [],
+  "tags": [
+    "roscon",
+    "demo",
+    "reductstore",
+    "robots"
+  ],
   "templating": {
     "list": []
   },
@@ -133,6 +2069,6 @@
   "timepicker": {},
   "timezone": "browser",
   "title": "ROSCon2025",
-  "uid": "af1yaezgyv2f4e",
-  "version": 1
+  "uid": "roscon2025",
+  "version": 2
 }
