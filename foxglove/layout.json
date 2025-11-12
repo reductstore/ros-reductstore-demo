@@ -1,30 +1,70 @@
 {
   "configById": {
-    "RawMessages!3fuhmdf": {
-      "diffEnabled": false,
-      "diffMethod": "custom",
-      "diffTopicPath": "",
-      "showFullMessageForDiff": false,
-      "topicPath": "/vectornav/IMU_restamped"
-    },
-    "Plot!25weexn": {
+    "Plot!43o0epn": {
       "paths": [
         {
           "timestampMethod": "receiveTime",
-          "value": "/vectornav/IMU_restamped.angular_velocity.x",
+          "value": "/vectornav/Pres_restamped.fluid_pressure",
           "enabled": true
         }
       ],
       "showXAxisLabels": true,
       "showYAxisLabels": true,
-      "showLegend": true,
+      "showLegend": false,
       "legendDisplay": "floating",
       "showPlotValuesInLegend": false,
       "isSynced": true,
       "xAxisVal": "timestamp",
-      "sidebarDimension": 240
+      "sidebarDimension": 240,
+      "foxglovePanelTitle": "Pressure"
     },
-    "Image!3mnp456": {
+    "Plot!2qe63ct": {
+      "paths": [
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/vectornav/Temp_restamped.temperature",
+          "enabled": true
+        }
+      ],
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "showLegend": false,
+      "legendDisplay": "floating",
+      "showPlotValuesInLegend": false,
+      "isSynced": true,
+      "xAxisVal": "timestamp",
+      "sidebarDimension": 240,
+      "foxglovePanelTitle": "Temperature"
+    },
+    "Plot!i988w8": {
+      "paths": [
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/vectornav/Mag_restamped.magnetic_field.x",
+          "enabled": true
+        },
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/vectornav/Mag_restamped.magnetic_field.y",
+          "enabled": true
+        },
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/vectornav/Mag_restamped.magnetic_field.z",
+          "enabled": true
+        }
+      ],
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "showLegend": false,
+      "legendDisplay": "floating",
+      "showPlotValuesInLegend": false,
+      "isSynced": true,
+      "xAxisVal": "timestamp",
+      "sidebarDimension": 240,
+      "foxglovePanelTitle": "Magnetic field "
+    },
+    "Image!1xtj425": {
       "cameraState": {
         "distance": 20,
         "perspective": true,
@@ -51,9 +91,7 @@
         "far": 5000
       },
       "followMode": "follow-pose",
-      "scene": {
-        "meshUpAxis": "y_up"
-      },
+      "scene": {},
       "transforms": {},
       "topics": {},
       "layers": {},
@@ -67,25 +105,27 @@
         "poseEstimateThetaDeviation": 0.26179939
       },
       "imageMode": {
-        "imageTopic": "/rsense/color/image_raw/compressed_restamped_downsampled",
-        "rotation": 90
+        "imageTopic": "/camera/image_color/compressed_restamped_downsampled",
+        "rotation": 270
       }
     }
   },
-  "globalVariables": {
-    "": "\"\""
-  },
+  "globalVariables": {},
   "userNodes": {},
   "playbackConfig": {
     "speed": 1
   },
   "layout": {
     "first": {
-      "first": "RawMessages!3fuhmdf",
-      "second": "Image!3mnp456",
-      "direction": "row"
+      "first": "Plot!43o0epn",
+      "second": {
+        "first": "Plot!2qe63ct",
+        "second": "Plot!i988w8",
+        "direction": "column"
+      },
+      "direction": "column"
     },
-    "second": "Plot!25weexn",
-    "direction": "column"
+    "second": "Image!1xtj425",
+    "direction": "row"
   }
 }
