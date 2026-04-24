@@ -1,0 +1,62 @@
+# ReductBridge configuration for the demo robot.
+#
+# Subscribes to ROS 2 topics (fed by `ros2 bag play` of the MCAP file)
+# and writes records into the edge ReductStore bucket `robot`.
+#
+# See: https://reduct.store/docs/reduct-bridge
+
+# -----------------------------------------------------------------------------
+# ROS 2 input: subscribe to topics from the simulated robot.
+# -----------------------------------------------------------------------------
+[inputs.ros2.robot]
+domain_id = 0
+node_name = "reduct_bridge"
+queue_size = 128
+
+[[inputs.ros2.robot.topics]]
+name = "/camera/image_raw/compressed_restamped"
+entry_name = "image"
+labels = [
+  { static = { source = "ros2", topic = "camera" } },
+]
+
+[[inputs.ros2.robot.topics]]
+name = "/tf_restamped"
+entry_name = "tf"
+labels = [
+  { static = { source = "ros2", topic = "tf" } },
+]
+
+[[inputs.ros2.robot.topics]]
+name = "/vectornav/IMU_restamped"
+entry_name = "imu"
+labels = [
+  { static = { source = "ros2", topic = "imu" } },
+]
+
+[[inputs.ros2.robot.topics]]
+name = "/diagnostics_restamped"
+entry_name = "diagnostics"
+labels = [
+  { static = { source = "ros2", topic = "diagnostics" } },
+]
+
+# -----------------------------------------------------------------------------
+# Remote: the edge ReductStore instance running in the `edge` service.
+# -----------------------------------------------------------------------------
+[[remotes.reduct]]
+name = "edge"
+url = "http://edge:8383"
+token_api = "edge"
+bucket = "robot"
+prefix = ""
+batch_max_records = 80
+batch_max_size_bytes = 8388608
+batch_max_interval_ms = 1000
+
+# -----------------------------------------------------------------------------
+# Pipeline: route every ROS 2 record into the edge store.
+# -----------------------------------------------------------------------------
+[pipelines.robot_to_edge]
+remote = "edge"
+inputs = ["robot"]

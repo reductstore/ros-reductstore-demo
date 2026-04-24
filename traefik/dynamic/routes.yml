@@ -1,0 +1,52 @@
+http:
+  routers:
+    dashboard:
+      rule: "Host(`traefik.reduct.demo`)"
+      entryPoints:
+        - web
+      service: api@internal
+
+    grafana:
+      rule: "Host(`grafana.reduct.demo`)"
+      entryPoints:
+        - web
+      service: grafana
+
+    foxglove:
+      rule: "Host(`foxglove.reduct.demo`)"
+      entryPoints:
+        - web
+      service: foxglove
+
+    edge:
+      rule: "Host(`edge.reduct.demo`)"
+      entryPoints:
+        - web
+      service: edge
+
+    cloud:
+      rule: "Host(`cloud.reduct.demo`)"
+      entryPoints:
+        - web
+      service: cloud
+
+  services:
+    grafana:
+      loadBalancer:
+        servers:
+          - url: "http://grafana:3000"
+
+    foxglove:
+      loadBalancer:
+        servers:
+          - url: "http://foxglove:8080"
+
+    edge:
+      loadBalancer:
+        servers:
+          - url: "http://edge:8383"
+
+    cloud:
+      loadBalancer:
+        servers:
+          - url: "http://cloud:8383"

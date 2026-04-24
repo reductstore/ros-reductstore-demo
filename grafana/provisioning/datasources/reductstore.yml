@@ -1,21 +1,18 @@
 apiVersion: 1
+
 datasources:
   - name: ReductStore Cloud
     type: reductstore-datasource
-    access: proxy
-    url: http://cloud:8383
+    uid: reductstore-cloud
+    isDefault: true
     jsonData:
-      token: grafana-read-token
-  - name: ReductStore Orion
+      serverURL: http://cloud:8383
+    secureJsonData:
+      serverToken: grafana
+  - name: ReductStore Edge
     type: reductstore-datasource
-    access: proxy
-    url: http://robot-orion:8383
-  - name: ReductStore Atlas
-    type: reductstore-datasource
-    access: proxy
-    url: http://robot-atlas:8383
-  - name: ReductStore Nova
-    type: reductstore-datasource
-    access: proxy
-    url: http://robot-nova:8383
-
+    uid: reductstore-edge
+    jsonData:
+      serverURL: http://edge:8383
+    secureJsonData:
+      serverToken: edge

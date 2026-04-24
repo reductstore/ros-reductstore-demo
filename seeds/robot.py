@@ -2,11 +2,13 @@
 # -*- coding: utf-8 -*-
 
 import os
+import sys
 import uuid
 import asyncio
 import logging
 import json
 import random
+import argparse
 from dataclasses import dataclass, field
 from typing import Dict, List, Tuple, Optional
 from datetime import datetime, timedelta, timezone
@@ -722,4 +724,15 @@ async def main():
 
 # ---------------------- Entrypoint ----------------------
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Seed robot data into ReductStore")
+    parser.add_argument(
+        "bucket",
+        nargs="?",
+        default="atlas",
+        choices=["orion", "nova", "atlas"],
+        help="Robot bucket name (default: atlas)",
+    )
+    args = parser.parse_args()
+    CFG.BUCKET = args.bucket
+    CFG.REDUCT_URL = f"http://{args.bucket}.field.demo"
     asyncio.run(main())

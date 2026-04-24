@@ -1,65 +1,123 @@
 # ros-reductstore-demo
 
-Demonstrate how [ReductStore](https://www.reduct.store) integrates with the [Canonical Observability Stack (COS) Lite](https://charmhub.io/topics/canonical-observability-stack/editions/lite).
-
-See demo's [setup instructions](docs/setup.md) for installing MicroK8s, Juju, COS Lite, ReductStore, and demo applications.
-
-## Demo with Docker Compose
-
-With Docker Compose, you can run a simplified version of the demo on a single machine without Kubernetes:
-
-- http://cloud.reduct.demo
-- http://orion.field.demo
-- http://atlas.field.demo
-- http://nova.field.demo
-- http://grafana.reduct.demo
-- http://foxglove.reduct.demo
-- http://traefik.reduct.demo
-
-To start the demo, run:
-
-```bash
-docker compose pull
-docker compose up -d
-```
-
-To update a certain service only, run:
-
-```bash
-docker compose pull <service-name>
-docker compose up -d <service-name>
-```
-If the configuration hasen't changed, you can also use `--force-recreate` to restart a service:
-
-```bash
-docker compose up -d --force-recreate <service-name>
-```
-
-
-## Demo with COS Lite and ReductStore
-
-MicroK8s is used to run a local Kubernetes cluster on a single machine (e.g., a laptop or server). Juju is used to deploy and manage applications on the Kubernetes cluster. 
-
-LXD containers simulate multiple robots on the same machine, each running a ROS 2 Foxglove demo application that plays back recorded data.
+Stream ROS 2 data from an MCAP file into [ReductStore](https://www.reduct.store)
+via [ReductBridge](https://github.com/reductstore/reduct-bridge), replicate a
+filtered slice to a cloud ReductStore, and visualize the result in Grafana and
+Foxglove — all from a single `docker compose up`.
 
 ![Diagram](docs/diagram.drawio.png)
 
-- **Canonical Observability Stack (COS) Lite** – Monitoring and logging with Grafana, Prometheus, Loki, and Alertmanager.
-- **ReductStore** – Time series object storage for MCAP files, images, and telemetry.
-- **reductstore_agent** – ROS 2 node for recording and uploading data into ReductStore.
-- **Foxglove** – Visualization of live and recorded robot data.
-- **Jupyter Notebook** – Example queries and analysis with ReductStore's Python SDK.
-- **Browsing Dashboard** – Minimal web demo to explore stored data.
-- **Registration Server** – Integrates robots into COS catalogue.
+## Data flow
 
+```
+  MCAP file  ──►  ros2 bag play  ──►  ROS 2 topics ──►  reduct-bridge
+                                                            │
+                                                            ▼
+                                                  ReductStore edge (robot)
+                                                            │
+                                           replication tasks (filtered)
+                                                            ▼
+                                                  ReductStore cloud
+                                                            │
+                                      ┌─────────────────────┴─────────────────────┐
+                                      ▼                                           ▼
+                                   Grafana                                    Foxglove
+```
 
+See [`docs/architecture.md`](docs/architecture.md) for the full breakdown.
 
+## Quick start
 
+1. **Clone the repo** and copy the env template:
+
+   ```bash
+   cp .env.example .env
+   ```
+
+2. *(Optional)* Put a ReductStore license at `./licenses/reduct.lic` if
+   you want to use Pro replication features. The demo also works in
+   read-only / limited mode without one.
+
+3. **Bring everything up**:
+
+   ```bash
+   docker compose pull
+   docker compose up -d --build
+   ```
+
+   First run builds the `robot` image (ROS 2 Jazzy + ReductBridge).
+
+4. **Add these to `/etc/hosts`** so the Traefik-routed URLs resolve:
+
+   ```
+   127.0.0.1  edge.reduct.demo cloud.reduct.demo grafana.reduct.demo foxglove.reduct.demo traefik.reduct.demo
+   ```
+
+5. **Open**:
+
+   - http://edge.reduct.demo — edge ReductStore UI (live ingest from the bridge)
+   - http://cloud.reduct.demo — cloud ReductStore UI (filtered replica)
+   - http://grafana.reduct.demo — dashboards, pre-wired to ReductStore Cloud
+   - http://foxglove.reduct.demo — Foxglove Studio
+   - http://traefik.reduct.demo — Traefik dashboard
+
+## Services
+
+| Service    | Purpose                                              |
+| ---------- | ---------------------------------------------------- |
+| `robot`    | `ros2 bag play` on the MCAP file + `reduct-bridge`   |
+| `edge`     | ReductStore on the robot — bridge writes here        |
+| `cloud`    | ReductStore aggregator — replication destination     |
+| `grafana`  | Dashboards (ReductStore Cloud datasource)            |
+| `foxglove` | Browser-based ROS viewer                             |
+| `traefik`  | Reverse proxy                                        |
+
+## Key files
+
+| Path                              | What it is                                      |
+| --------------------------------- | ----------------------------------------------- |
+| `docker-compose.yml`              | All services, plus the three replication tasks |
+| `docker/Dockerfile`               | Builds the combined ROS 2 + ReductBridge image  |
+| `config/reduct-bridge.toml`       | ReductBridge topic subscriptions and remote     |
+| `data/example-010-amr.mcap`       | Sample MCAP (Foxglove AMR Treescope example)    |
+| `grafana/provisioning/`           | Pre-provisioned datasource + dashboard provider |
+| `grafana/dashboards/`             | Dashboard JSON files loaded by the provider     |
+| `foxglove/layout.json`            | Example Foxglove layout                         |
+
+## Common operations
+
+Update a single service:
+
+```bash
+docker compose pull <service>
+docker compose up -d <service>
+```
+
+Force a clean rebuild of the robot container (after editing the bridge
+config or Dockerfile):
+
+```bash
+docker compose up -d --build --force-recreate robot
+```
+
+Tail bridge + player output:
+
+```bash
+docker compose logs -f robot
+```
+
+## Next steps
+
+- [`docs/architecture.md`](docs/architecture.md) — data flow and replication rules
+- [`docs/cloud-deployment.md`](docs/cloud-deployment.md) — **optional** Kubernetes / COS Lite deployment
+- [`docs/charm.md`](docs/charm.md) — building and publishing the ReductStore Juju charm
+- [`docs/ros.md`](docs/ros.md) — Jupyter + ROS 2 setup for the example notebook
+- [`docs/debug.md`](docs/debug.md) — troubleshooting MicroK8s / Juju (cloud path)
 
 ## References
 
-- [ReductStore Documentation](https://reduct.store/docs)
-- [Canonical Observability Stack Lite](https://charmhub.io/topics/canonical-observability-stack/editions/lite)
-- [ROS 2 Documentation](https://docs.ros.org)
+- [ReductStore](https://reduct.store/docs)
+- [ReductBridge](https://github.com/reductstore/reduct-bridge)
+- [ROS 2](https://docs.ros.org)
 - [Foxglove Studio](https://foxglove.dev)
-- [LXD Containers](https://canonical.com/lxd)
+- [Canonical Observability Stack Lite](https://charmhub.io/topics/canonical-observability-stack/editions/lite)

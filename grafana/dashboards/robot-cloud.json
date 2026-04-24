@@ -1,0 +1,1050 @@
+{
+  "annotations": {
+    "list": []
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "type": "text",
+      "id": 1,
+      "gridPos": {
+        "h": 3,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "options": {
+        "content": "# Robot Cloud Monitoring\nReal-time data replicated from edge ReductStore — camera images at 1 fps, IMU / TF / diagnostics at 1 Hz",
+        "mode": "markdown"
+      },
+      "transparent": true
+    },
+    {
+      "type": "row",
+      "id": 2,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 3
+      },
+      "title": "Cloud Data Overview",
+      "collapsed": false,
+      "panels": []
+    },
+    {
+      "type": "stat",
+      "id": 3,
+      "title": "Camera Images",
+      "description": "Compressed camera frames replicated at 1 fps",
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 0,
+        "y": 4
+      },
+      "datasource": {
+        "type": "reductstore-datasource",
+        "uid": "reductstore-cloud"
+      },
+      "targets": [
+        {
+          "bucket": "robot",
+          "entry": "image",
+          "options": {
+            "mode": "labels",
+            "when": {
+              "$each_t": "1s",
+              "#select_labels": [
+                "topic"
+              ]
+            }
+          },
+          "refId": "A",
+          "datasource": {
+            "type": "reductstore-datasource",
+            "uid": "reductstore-cloud"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 1
+              },
+              {
+                "color": "green",
+                "value": 30
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "background_solid",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "count"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      }
+    },
+    {
+      "type": "stat",
+      "id": 4,
+      "title": "IMU Readings",
+      "description": "VectorNav IMU data replicated at 1 Hz",
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 6,
+        "y": 4
+      },
+      "datasource": {
+        "type": "reductstore-datasource",
+        "uid": "reductstore-cloud"
+      },
+      "targets": [
+        {
+          "bucket": "robot",
+          "entry": "imu",
+          "options": {
+            "mode": "labels",
+            "when": {
+              "$each_t": "1s",
+              "#select_labels": [
+                "topic"
+              ]
+            }
+          },
+          "refId": "A",
+          "datasource": {
+            "type": "reductstore-datasource",
+            "uid": "reductstore-cloud"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 1
+              },
+              {
+                "color": "green",
+                "value": 30
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "background_solid",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "count"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      }
+    },
+    {
+      "type": "stat",
+      "id": 5,
+      "title": "TF Transforms",
+      "description": "Coordinate transform frames replicated at 1 Hz",
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 12,
+        "y": 4
+      },
+      "datasource": {
+        "type": "reductstore-datasource",
+        "uid": "reductstore-cloud"
+      },
+      "targets": [
+        {
+          "bucket": "robot",
+          "entry": "tf",
+          "options": {
+            "mode": "labels",
+            "when": {
+              "$each_t": "1s",
+              "#select_labels": [
+                "topic"
+              ]
+            }
+          },
+          "refId": "A",
+          "datasource": {
+            "type": "reductstore-datasource",
+            "uid": "reductstore-cloud"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 1
+              },
+              {
+                "color": "green",
+                "value": 30
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "background_solid",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "count"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      }
+    },
+    {
+      "type": "stat",
+      "id": 6,
+      "title": "Diagnostics",
+      "description": "ROS diagnostics messages replicated at 1 Hz",
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 18,
+        "y": 4
+      },
+      "datasource": {
+        "type": "reductstore-datasource",
+        "uid": "reductstore-cloud"
+      },
+      "targets": [
+        {
+          "bucket": "robot",
+          "entry": "diagnostics",
+          "options": {
+            "mode": "labels",
+            "when": {
+              "$each_t": "1s",
+              "#select_labels": [
+                "topic"
+              ]
+            }
+          },
+          "refId": "A",
+          "datasource": {
+            "type": "reductstore-datasource",
+            "uid": "reductstore-cloud"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 1
+              },
+              {
+                "color": "green",
+                "value": 30
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "background_solid",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "count"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      }
+    },
+    {
+      "type": "row",
+      "id": 7,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 9
+      },
+      "title": "Cloud Data Flow",
+      "collapsed": false,
+      "panels": []
+    },
+    {
+      "type": "state-timeline",
+      "id": 8,
+      "title": "Data Availability",
+      "description": "Shows when each ROS topic is actively receiving replicated data",
+      "gridPos": {
+        "h": 6,
+        "w": 24,
+        "x": 0,
+        "y": 10
+      },
+      "datasource": {
+        "type": "reductstore-datasource",
+        "uid": "reductstore-cloud"
+      },
+      "targets": [
+        {
+          "bucket": "robot",
+          "entry": "image",
+          "options": {
+            "mode": "labels",
+            "when": {
+              "$each_t": "$__interval",
+              "#select_labels": [
+                "topic"
+              ]
+            }
+          },
+          "refId": "A",
+          "datasource": {
+            "type": "reductstore-datasource",
+            "uid": "reductstore-cloud"
+          }
+        },
+        {
+          "bucket": "robot",
+          "entry": "imu",
+          "options": {
+            "mode": "labels",
+            "when": {
+              "$each_t": "$__interval",
+              "#select_labels": [
+                "topic"
+              ]
+            }
+          },
+          "refId": "B",
+          "datasource": {
+            "type": "reductstore-datasource",
+            "uid": "reductstore-cloud"
+          }
+        },
+        {
+          "bucket": "robot",
+          "entry": "tf",
+          "options": {
+            "mode": "labels",
+            "when": {
+              "$each_t": "$__interval",
+              "#select_labels": [
+                "topic"
+              ]
+            }
+          },
+          "refId": "C",
+          "datasource": {
+            "type": "reductstore-datasource",
+            "uid": "reductstore-cloud"
+          }
+        },
+        {
+          "bucket": "robot",
+          "entry": "diagnostics",
+          "options": {
+            "mode": "labels",
+            "when": {
+              "$each_t": "$__interval",
+              "#select_labels": [
+                "topic"
+              ]
+            }
+          },
+          "refId": "D",
+          "datasource": {
+            "type": "reductstore-datasource",
+            "uid": "reductstore-cloud"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "dark-red",
+                "value": null
+              },
+              {
+                "color": "dark-green",
+                "value": ""
+              }
+            ]
+          },
+          "custom": {
+            "fillOpacity": 80,
+            "lineWidth": 0
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "A"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Camera"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "blue"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "B"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "IMU"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "green"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "C"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "TF"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "orange"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "D"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Diagnostics"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "purple"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showValue": "never",
+        "mergeValues": true,
+        "alignValue": "center",
+        "rowHeight": 0.8,
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      }
+    },
+    {
+      "type": "row",
+      "id": 9,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 16
+      },
+      "title": "Edge vs Cloud Comparison",
+      "collapsed": false,
+      "panels": []
+    },
+    {
+      "type": "stat",
+      "id": 10,
+      "title": "Edge — Image Records",
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 0,
+        "y": 17
+      },
+      "datasource": {
+        "type": "reductstore-datasource",
+        "uid": "reductstore-edge"
+      },
+      "targets": [
+        {
+          "bucket": "robot",
+          "entry": "image",
+          "options": {
+            "mode": "labels",
+            "when": {
+              "$each_t": "1s",
+              "#select_labels": [
+                "topic"
+              ]
+            }
+          },
+          "refId": "A",
+          "datasource": {
+            "type": "reductstore-datasource",
+            "uid": "reductstore-edge"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "dark-blue",
+                "value": null
+              },
+              {
+                "color": "blue",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "background_solid",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "count"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      }
+    },
+    {
+      "type": "stat",
+      "id": 11,
+      "title": "Edge — IMU Records",
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 6,
+        "y": 17
+      },
+      "datasource": {
+        "type": "reductstore-datasource",
+        "uid": "reductstore-edge"
+      },
+      "targets": [
+        {
+          "bucket": "robot",
+          "entry": "imu",
+          "options": {
+            "mode": "labels",
+            "when": {
+              "$each_t": "1s",
+              "#select_labels": [
+                "topic"
+              ]
+            }
+          },
+          "refId": "A",
+          "datasource": {
+            "type": "reductstore-datasource",
+            "uid": "reductstore-edge"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "dark-blue",
+                "value": null
+              },
+              {
+                "color": "blue",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "background_solid",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "count"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      }
+    },
+    {
+      "type": "stat",
+      "id": 12,
+      "title": "Edge — TF Records",
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 12,
+        "y": 17
+      },
+      "datasource": {
+        "type": "reductstore-datasource",
+        "uid": "reductstore-edge"
+      },
+      "targets": [
+        {
+          "bucket": "robot",
+          "entry": "tf",
+          "options": {
+            "mode": "labels",
+            "when": {
+              "$each_t": "1s",
+              "#select_labels": [
+                "topic"
+              ]
+            }
+          },
+          "refId": "A",
+          "datasource": {
+            "type": "reductstore-datasource",
+            "uid": "reductstore-edge"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "dark-blue",
+                "value": null
+              },
+              {
+                "color": "blue",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "background_solid",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "count"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      }
+    },
+    {
+      "type": "stat",
+      "id": 13,
+      "title": "Edge — Diagnostics",
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 18,
+        "y": 17
+      },
+      "datasource": {
+        "type": "reductstore-datasource",
+        "uid": "reductstore-edge"
+      },
+      "targets": [
+        {
+          "bucket": "robot",
+          "entry": "diagnostics",
+          "options": {
+            "mode": "labels",
+            "when": {
+              "$each_t": "1s",
+              "#select_labels": [
+                "topic"
+              ]
+            }
+          },
+          "refId": "A",
+          "datasource": {
+            "type": "reductstore-datasource",
+            "uid": "reductstore-edge"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "dark-blue",
+                "value": null
+              },
+              {
+                "color": "blue",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "background_solid",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "count"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      }
+    },
+    {
+      "type": "row",
+      "id": 14,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 21
+      },
+      "title": "Cloud — Recent Records",
+      "collapsed": false,
+      "panels": []
+    },
+    {
+      "type": "table",
+      "id": 15,
+      "title": "Latest Camera Records",
+      "description": "Most recent camera image records in the cloud",
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 0,
+        "y": 22
+      },
+      "datasource": {
+        "type": "reductstore-datasource",
+        "uid": "reductstore-cloud"
+      },
+      "targets": [
+        {
+          "bucket": "robot",
+          "entry": "image",
+          "options": {
+            "mode": "labels",
+            "when": {
+              "$each_t": "1s"
+            }
+          },
+          "refId": "A",
+          "datasource": {
+            "type": "reductstore-datasource",
+            "uid": "reductstore-cloud"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": true,
+            "displayName": "Time"
+          }
+        ],
+        "cellHeight": "sm",
+        "footer": {
+          "show": false
+        }
+      }
+    },
+    {
+      "type": "table",
+      "id": 16,
+      "title": "Latest Telemetry Records",
+      "description": "Most recent IMU / TF / diagnostics records in the cloud",
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 12,
+        "y": 22
+      },
+      "datasource": {
+        "type": "reductstore-datasource",
+        "uid": "reductstore-cloud"
+      },
+      "targets": [
+        {
+          "bucket": "robot",
+          "entry": "imu",
+          "options": {
+            "mode": "labels",
+            "when": {
+              "$each_t": "1s"
+            }
+          },
+          "refId": "A",
+          "datasource": {
+            "type": "reductstore-datasource",
+            "uid": "reductstore-cloud"
+          }
+        },
+        {
+          "bucket": "robot",
+          "entry": "tf",
+          "options": {
+            "mode": "labels",
+            "when": {
+              "$each_t": "1s"
+            }
+          },
+          "refId": "B",
+          "datasource": {
+            "type": "reductstore-datasource",
+            "uid": "reductstore-cloud"
+          }
+        },
+        {
+          "bucket": "robot",
+          "entry": "diagnostics",
+          "options": {
+            "mode": "labels",
+            "when": {
+              "$each_t": "1s"
+            }
+          },
+          "refId": "C",
+          "datasource": {
+            "type": "reductstore-datasource",
+            "uid": "reductstore-cloud"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": true,
+            "displayName": "Time"
+          }
+        ],
+        "cellHeight": "sm",
+        "footer": {
+          "show": false
+        }
+      }
+    },
+    {
+      "type": "row",
+      "id": 17,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 29
+      },
+      "title": "Replication Details",
+      "collapsed": false,
+      "panels": []
+    },
+    {
+      "type": "text",
+      "id": 18,
+      "gridPos": {
+        "h": 5,
+        "w": 24,
+        "x": 0,
+        "y": 30
+      },
+      "options": {
+        "content": "### Replication Rules\n\n| Rule | Source | Target | Entries | Condition |\n|------|--------|--------|---------|----------|\n| **R1** robot-image-1fps | Edge `robot` | Cloud `robot` | `image` | `$each_t: 1s` (1 fps) |\n| **R2** robot-medium | Edge `robot` | Cloud `robot` | all | Medium severity events |\n| **R3** robot-high | Edge `robot` | Cloud `robot` | all | High severity + 5 min context |\n| **R4** robot-telemetry | Edge `robot` | Cloud `robot` | `imu, tf, diagnostics` | `$each_t: 1s` (1 Hz) |\n\n> R2 and R3 filter on AI / sensor labels (`event_severity`, `obstacle_dist_cm`, `battery_pct`, `cpu_temp_c`) that are populated by downstream analytics pipelines.",
+        "mode": "markdown"
+      },
+      "transparent": true
+    }
+  ],
+  "schemaVersion": 40,
+  "tags": [
+    "robot",
+    "reductstore",
+    "cloud"
+  ],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Robot Cloud Monitoring",
+  "uid": "robot-cloud-monitoring",
+  "version": 1
+}
